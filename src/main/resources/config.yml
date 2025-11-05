@@ -6,6 +6,11 @@
 ###########################################################
 
 # ─────────────────────────────────────────────────────────
+# DO NOT TOUCH
+# ─────────────────────────────────────────────────────────
+config-version: 1
+
+# ─────────────────────────────────────────────────────────
 # Plugin message prefix
 # Supports '&' color codes (e.g., &6 = gold, &f = white)
 # Appears in front of most chat messages sent by this plugin.

@@ -1,9 +1,18 @@
 package me.sparklee.threeLives;
 
-import me.sparklee.threeLives.commands.*;
-import me.sparklee.threeLives.events.*;
-import me.sparklee.threeLives.data.*;
-import me.sparklee.threeLives.items.*;
+import me.sparklee.threeLives.commands.LivesCommand;
+import me.sparklee.threeLives.commands.ReloadCommand;
+import me.sparklee.threeLives.commands.ReviveCommand;
+import me.sparklee.threeLives.events.DeathListener;
+import me.sparklee.threeLives.events.JoinListener;
+import me.sparklee.threeLives.events.CraftingListener;
+import me.sparklee.threeLives.items.ReviveItem;
+import me.sparklee.threeLives.utils.MessageManager;
+import me.sparklee.threeLives.data.DatabaseManager;
+import me.sparklee.threeLives.data.PlayerManager;
+import me.sparklee.threeLives.commands.MainCommand;
+import me.sparklee.threeLives.utils.ConfigManager;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ThreeLivesSMP extends JavaPlugin {
@@ -16,26 +25,28 @@ public class ThreeLivesSMP extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        saveDefaultConfig();
+
+        // Initialize version-aware config manager
+        ConfigManager configManager = new ConfigManager(this, "config.yml");
+        configManager.load(); // Handles version check, backups, and updates
 
         databaseManager = new DatabaseManager(this);
         databaseManager.connect();
 
         playerManager = new PlayerManager(this);
         reviveItem = new ReviveItem(this);
+        MessageManager.load();
 
-        // Event registration
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
 
-        // Command registration
         getCommand("revive").setExecutor(new ReviveCommand(this));
-        getCommand("threelives").setExecutor(new LivesCommand(this));
-        getCommand("threelives-recipe").setExecutor(new ReviveRecipeCommand(this));
-        getCommand("threelives-reload").setExecutor(new ReloadCommand(this));
+        getCommand("lives").setExecutor(new LivesCommand(this));
+        getCommand("threelivesreload").setExecutor(new ReloadCommand(this));
+        getCommand("threelives").setExecutor(new MainCommand(this));
 
-        getLogger().info("✅ 3LivesSMP enabled successfully!");
+        getLogger().info("3LivesSMP enabled successfully!");
     }
 
     @Override

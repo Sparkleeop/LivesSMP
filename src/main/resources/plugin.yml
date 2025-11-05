@@ -5,21 +5,19 @@ api-version: 1.21
 author: Sparklee
 
 commands:
+  threelives:
+    description: 3LivesSMP main command
+    usage: /threelives <lives|revive|reload>
+    aliases: [revive, lives, threelivesreload]
   revive:
     description: Revive a banned player using a Revive Crystal
     usage: /revive <player>
-
-  threelives:
+  lives:
     description: Check your remaining lives
-    usage: /threelives
-
-  threelives-recipe:
-    description: View the Revive Crystal recipe
-    usage: /threelives-recipe
-
-  threelives-reload:
+    usage: /lives
+  threelivesreload:
     description: Reload 3LivesSMP configuration
-    usage: /threelives-reload
+    usage: /threelivesreload
 
 permissions:
   threelives.reload:
