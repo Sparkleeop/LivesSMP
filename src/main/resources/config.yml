@@ -1,0 +1,88 @@
+###########################################################
+#                  3LivesSMP Configuration                #
+#       Created by Sparklee | https://www.spigotmc.org/members/sparklee.1696271/         #
+#   For help with Material names, see:                    #
+#   https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+###########################################################
+
+# ─────────────────────────────────────────────────────────
+# Plugin message prefix
+# Supports '&' color codes (e.g., &6 = gold, &f = white)
+# Appears in front of most chat messages sent by this plugin.
+# ─────────────────────────────────────────────────────────
+prefix: "&6[3LivesSMP] &f"
+
+# ─────────────────────────────────────────────────────────
+# Revive Crystal Settings
+# The Revive Crystal is used to revive banned players.
+# You can fully customize its crafting recipe here.
+# ─────────────────────────────────────────────────────────
+revive-crystal:
+
+  # Enable or disable crafting of the Revive Crystal.
+  enabled: true
+
+  # How many crystals are crafted per recipe.
+  amount: 1
+
+  # Crafting shape (3 lines, each 3 characters).
+  # You can use any characters here as keys, as long as
+  # each one is defined in the "ingredients" section below.
+  #
+  # Example layout:
+  #   D = Diamond Block
+  #   E = End Crystal
+  #   S = Totem of Undying
+  #
+  #  D E D
+  #  E S E
+  #  D E D
+  shape:
+    - "DED"
+    - "ESE"
+    - "DED"
+
+  # Ingredient mapping
+  # Each key corresponds to a symbol used above in the shape.
+  # For a full list of valid Material names, see:
+  # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+  ingredients:
+    D: DIAMOND_BLOCK
+    E: END_CRYSTAL
+    S: TOTEM_OF_UNDYING
+
+# ─────────────────────────────────────────────────────────
+# Plugin Messages
+# ─────────────────────────────────────────────────────────
+messages:
+  join-new: "&aWelcome to 3 Lives SMP! You’ve been given &e3 lives&a."
+  join-return: "&7Welcome back! You currently have &e%lives% &7lives."
+
+  life-lost: "&cYou lost a life! &7Lives remaining: &e%lives%"
+  no-lives-left: "&c☠ You’ve lost all 3 of your lives! You are now banned until revived."
+
+  revive-success: "&aYou revived &e%target%&a!"
+  revive-target: "&aYou’ve been revived by &e%player%&a!"
+  revive-broadcast: "&#FF9F68⚡ &e%player% &7has revived &b%target% &7using a Revive Crystal!"
+  revive-invalid-item: "&cYou must hold a Revive Crystal to use this!"
+  revive-invalid-player: "&cThat player has never joined the server!"
+
+  lives-display: "&7You currently have &e%lives% &7lives remaining."
+
+
+# ─────────────────────────────────────────────────────────
+# MySQL Database Settings
+# If MySQL is disabled, the plugin will automatically use
+# local YAML storage (plugins/3LivesSMP/data.yml)
+# ─────────────────────────────────────────────────────────
+mysql:
+  enabled: false
+  host: "localhost"
+  port: 3306
+  database: "threelives"
+  username: "root"
+  password: "password"
+
+###########################################################
+#  End of Configuration File
+###########################################################
