@@ -1,14 +1,14 @@
 name: 3LivesSMP
-main: me.sparklee.threeLives.ThreeLivesSMP
-version: 1.0.1
+main: me.sparklee.LivesSMP.LivesSMP
+version: 1.2.0
 api-version: 1.21
 author: Sparklee
 
 commands:
   threelives:
     description: 3LivesSMP main command
-    usage: /threelives <lives|revive|reload>
-    aliases: [revive, lives, threelivesreload]
+    usage: /livessmp <lives|revive|reload>
+    aliases: [revive, lives, livessmpreload]
   revive:
     description: Revive a banned player using a Revive Crystal
     usage: /revive <player>
@@ -17,9 +17,28 @@ commands:
     usage: /lives
   threelivesreload:
     description: Reload 3LivesSMP configuration
-    usage: /threelivesreload
+    usage: /livessmpreload
+  addlives:
+    description: Add lives to a player
+    usage: /addlives <player> <amount>
+  setlives:
+    description: Set the lives of a player
+    usage: /setlives <player> <amount>
+  removelives:
+    description: Remove lives from a player
+    usage: /removelives <player> <amount>
+  checklives:
+    description: Check another player’s lives
+    usage: /checklives <player>
 
 permissions:
-  threelives.reload:
-    description: Allows reloading of 3LivesSMP config
+  livessmp.admin:
+    description: Allows managing player lives (add/set/remove)
     default: op
+  livessmp.bypass:
+    description: Prevents life loss and bans from LivesSMP
+    default: op
+  livessmp.check:
+    description: Allows checking other players' lives
+    default: op
+

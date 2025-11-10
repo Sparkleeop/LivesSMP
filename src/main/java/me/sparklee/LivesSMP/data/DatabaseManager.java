@@ -1,20 +1,20 @@
-package me.sparklee.threeLives.data;
+package me.sparklee.LivesSMP.data;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
 
 public class DatabaseManager {
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
     private Connection connection;
     private boolean enabled = false;
 
     private String host, database, username, password;
     private int port;
 
-    public DatabaseManager(ThreeLivesSMP plugin) {
+    public DatabaseManager(LivesSMP plugin) {
         this.plugin = plugin;
     }
 
@@ -65,7 +65,7 @@ public class DatabaseManager {
                 if (!enabled) return;
                 try {
                     if (!isConnected()) {
-                        plugin.getLogger().warning("[3LivesSMP] MySQL connection lost! Attempting reconnect...");
+                        plugin.getLogger().warning("[LivesSMP] MySQL connection lost! Attempting reconnect...");
                         reconnect();
                     } else {
                         try (PreparedStatement ps = connection.prepareStatement("SELECT 1")) {
@@ -73,7 +73,7 @@ public class DatabaseManager {
                         }
                     }
                 } catch (SQLException e) {
-                    plugin.getLogger().warning("[3LivesSMP] MySQL keep-alive failed: " + e.getMessage());
+                    plugin.getLogger().warning("[LivesSMP] MySQL keep-alive failed: " + e.getMessage());
                     reconnect();
                 }
             }
@@ -129,7 +129,7 @@ public class DatabaseManager {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt("lives");
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("[3LivesSMP] getLives() SQL error: " + e.getMessage());
+            Bukkit.getLogger().severe("[LivesSMP] getLives() SQL error: " + e.getMessage());
         }
         return -1;
     }
@@ -145,7 +145,7 @@ public class DatabaseManager {
             ps.setInt(3, lives);
             ps.executeUpdate();
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("[3LivesSMP] setLives() SQL error: " + e.getMessage());
+            Bukkit.getLogger().severe("[LivesSMP] setLives() SQL error: " + e.getMessage());
         }
     }
 

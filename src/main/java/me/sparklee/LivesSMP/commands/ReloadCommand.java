@@ -1,22 +1,22 @@
-package me.sparklee.threeLives.commands;
+package me.sparklee.LivesSMP.commands;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
-import me.sparklee.threeLives.utils.MessageManager;
+import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ReloadCommand implements CommandExecutor {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
 
-    public ReloadCommand(ThreeLivesSMP plugin) {
+    public ReloadCommand(LivesSMP plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!sender.hasPermission("threelives.reload")) {
+        if (!sender.hasPermission("lives.admin")) {
             sender.sendMessage(MessageManager.get("no-permission", "&cYou don't have permission to do that!"));
             return true;
         }

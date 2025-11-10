@@ -1,7 +1,7 @@
-package me.sparklee.threeLives.commands;
+package me.sparklee.LivesSMP.commands;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
-import me.sparklee.threeLives.utils.MessageManager;
+import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.*;
@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class ReviveCommand implements CommandExecutor {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
 
-    public ReviveCommand(ThreeLivesSMP plugin) {
+    public ReviveCommand(LivesSMP plugin) {
         this.plugin = plugin;
     }
 

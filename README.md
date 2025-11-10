@@ -1,1 +1,1 @@
-# 3LivesSMP
+# LivesSMP

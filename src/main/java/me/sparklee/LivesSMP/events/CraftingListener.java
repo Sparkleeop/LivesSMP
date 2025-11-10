@@ -1,6 +1,6 @@
-package me.sparklee.threeLives.events;
+package me.sparklee.LivesSMP.events;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class CraftingListener implements Listener {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
 
-    public CraftingListener(ThreeLivesSMP plugin) {
+    public CraftingListener(LivesSMP plugin) {
         this.plugin = plugin;
     }
 

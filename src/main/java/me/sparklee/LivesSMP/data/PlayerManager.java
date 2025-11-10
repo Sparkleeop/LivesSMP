@@ -1,6 +1,6 @@
-package me.sparklee.threeLives.data;
+package me.sparklee.LivesSMP.data;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class PlayerManager {
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
     private File dataFile;
     private FileConfiguration dataConfig;
 
-    public PlayerManager(ThreeLivesSMP plugin) {
+    public PlayerManager(LivesSMP plugin) {
         this.plugin = plugin;
 
         // Load or create data.yml only if MySQL is disabled

@@ -1,6 +1,6 @@
-package me.sparklee.threeLives.utils;
+package me.sparklee.LivesSMP.utils;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class MessageManager {
@@ -8,7 +8,7 @@ public class MessageManager {
     private static FileConfiguration config;
 
     public static void load() {
-        config = ThreeLivesSMP.getInstance().getConfig();
+        config = LivesSMP.getInstance().getConfig();
     }
 
     /**

@@ -1,4 +1,4 @@
-package me.sparklee.threeLives.utils;
+package me.sparklee.LivesSMP.utils;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -1,6 +1,6 @@
-package me.sparklee.threeLives.utils;
+package me.sparklee.LivesSMP.utils;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.ChatColor;
 
 import java.util.regex.Matcher;
@@ -41,7 +41,7 @@ public class Messages {
      * Fetches prefix from config.yml
      */
     public static String prefix() {
-        String rawPrefix = ThreeLivesSMP.getInstance().getConfig().getString("prefix", "&6[3LivesSMP] &f");
+        String rawPrefix = LivesSMP.getInstance().getConfig().getString("prefix", "&6[LivesSMP] &f");
         return format(rawPrefix, false);
     }
 

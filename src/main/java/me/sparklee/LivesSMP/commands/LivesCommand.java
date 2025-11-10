@@ -1,7 +1,7 @@
-package me.sparklee.threeLives.commands;
+package me.sparklee.LivesSMP.commands;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
-import me.sparklee.threeLives.utils.MessageManager;
+import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 public class LivesCommand implements CommandExecutor {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
 
-    public LivesCommand(ThreeLivesSMP plugin) {
+    public LivesCommand(LivesSMP plugin) {
         this.plugin = plugin;
     }
 

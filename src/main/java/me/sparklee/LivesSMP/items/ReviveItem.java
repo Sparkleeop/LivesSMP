@@ -1,6 +1,6 @@
-package me.sparklee.threeLives.items;
+package me.sparklee.LivesSMP.items;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
+import me.sparklee.LivesSMP.LivesSMP;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,10 +12,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class ReviveItem {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
     private final ItemStack reviveCrystal;
 
-    public ReviveItem(ThreeLivesSMP plugin) {
+    public ReviveItem(LivesSMP plugin) {
         this.plugin = plugin;
 
         // Create the base item
@@ -52,13 +52,13 @@ public class ReviveItem {
 
         // Validate shape
         if (shape == null || shape.size() != 3) {
-            plugin.getLogger().severe("[3LivesSMP] Invalid revive-crystal shape! Must have exactly 3 lines.");
+            plugin.getLogger().severe("[LivesSMP] Invalid revive-crystal shape! Must have exactly 3 lines.");
             return;
         }
 
         for (String line : shape) {
             if (line == null || line.length() != 3) {
-                plugin.getLogger().severe("[3LivesSMP] Each revive-crystal shape line must be exactly 3 characters long!");
+                plugin.getLogger().severe("[LivesSMP] Each revive-crystal shape line must be exactly 3 characters long!");
                 return;
             }
         }
@@ -69,7 +69,7 @@ public class ReviveItem {
         // Validate ingredients
         ConfigurationSection ingredients = plugin.getConfig().getConfigurationSection("revive-crystal.ingredients");
         if (ingredients == null) {
-            plugin.getLogger().severe("[3LivesSMP] revive-crystal.ingredients missing in config!");
+            plugin.getLogger().severe("[LivesSMP] revive-crystal.ingredients missing in config!");
             return;
         }
 
@@ -77,13 +77,13 @@ public class ReviveItem {
         for (String symbol : ingredients.getKeys(false)) {
             String matName = ingredients.getString(symbol);
             if (matName == null) {
-                plugin.getLogger().warning("[3LivesSMP] Ingredient symbol '" + symbol + "' has no material defined!");
+                plugin.getLogger().warning("[LivesSMP] Ingredient symbol '" + symbol + "' has no material defined!");
                 continue;
             }
 
             Material mat = Material.matchMaterial(matName);
             if (mat == null) {
-                plugin.getLogger().severe("[3LivesSMP] Invalid material for '" + symbol + "': " + matName);
+                plugin.getLogger().severe("[LivesSMP] Invalid material for '" + symbol + "': " + matName);
                 continue;
             }
 
@@ -92,7 +92,7 @@ public class ReviveItem {
         }
 
         if (!validIngredientFound) {
-            plugin.getLogger().severe("[3LivesSMP] No valid materials found in revive-crystal.ingredients — recipe not registered.");
+            plugin.getLogger().severe("[LivesSMP] No valid materials found in revive-crystal.ingredients — recipe not registered.");
             return;
         }
 
@@ -100,7 +100,7 @@ public class ReviveItem {
             Bukkit.addRecipe(recipe);
             plugin.getLogger().info(" Revive Crystal recipe registered successfully.");
         } catch (Exception e) {
-            plugin.getLogger().severe("[3LivesSMP] Failed to register Revive Crystal recipe: " + e.getMessage());
+            plugin.getLogger().severe("[LivesSMP] Failed to register Revive Crystal recipe: " + e.getMessage());
         }
     }
 

@@ -1,7 +1,7 @@
-package me.sparklee.threeLives.events;
+package me.sparklee.LivesSMP.events;
 
-import me.sparklee.threeLives.ThreeLivesSMP;
-import me.sparklee.threeLives.utils.MessageManager;
+import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,9 +9,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class JoinListener implements Listener {
 
-    private final ThreeLivesSMP plugin;
+    private final LivesSMP plugin;
 
-    public JoinListener(ThreeLivesSMP plugin) {
+    public JoinListener(LivesSMP plugin) {
         this.plugin = plugin;
     }
 
@@ -22,7 +22,7 @@ public class JoinListener implements Listener {
 
         if (!plugin.getPlayerManager().hasData(player)) {
             plugin.getPlayerManager().setLives(player, 3);
-            player.sendMessage(MessageManager.get("join-new", "&aWelcome to 3 Lives SMP! You’ve been given &e3 lives&a."));
+            player.sendMessage(MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e3 lives&a."));
         } else {
             player.sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("join-return", "&7Welcome back! You currently have &e%lives% &7lives."),

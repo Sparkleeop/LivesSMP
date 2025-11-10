@@ -1,5 +1,5 @@
 ###########################################################
-#                  3LivesSMP Configuration                #
+#                  LivesSMP Configuration                 #
 #       Created by Sparklee | https://www.spigotmc.org/members/sparklee.1696271/         #
 #   For help with Material names, see:                    #
 #   https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
@@ -8,14 +8,14 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 1
+config-version: 2
 
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix
 # Supports '&' color codes (e.g., &6 = gold, &f = white)
 # Appears in front of most chat messages sent by this plugin.
 # ─────────────────────────────────────────────────────────
-prefix: "&6[3LivesSMP] &f"
+prefix: "&6[LivesSMP] &f"
 
 # ─────────────────────────────────────────────────────────
 # Revive Crystal Settings
@@ -60,11 +60,11 @@ revive-crystal:
 # Plugin Messages
 # ─────────────────────────────────────────────────────────
 messages:
-  join-new: "&aWelcome to 3 Lives SMP! You’ve been given &e3 lives&a."
+  join-new: "&aWelcome to Lives SMP! You’ve been given &e3 lives&a."
   join-return: "&7Welcome back! You currently have &e%lives% &7lives."
 
   life-lost: "&cYou lost a life! &7Lives remaining: &e%lives%"
-  no-lives-left: "&c☠ You’ve lost all 3 of your lives! You are now banned until revived."
+  no-lives-left: "&c☠ You’ve lost all of your lives! You are now banned until revived."
 
   revive-success: "&aYou revived &e%target%&a!"
   revive-target: "&aYou’ve been revived by &e%player%&a!"
@@ -74,17 +74,33 @@ messages:
 
   lives-display: "&7You currently have &e%lives% &7lives remaining."
 
+  no-permission: "&cYou don't have permission to do that!"
+  invalid-amount: "&cPlease provide a valid number for amount!"
+  player-never-joined: "&cThat player has never joined before!"
+  usage-add: "&eUsage: /addlives <player> <amount>"
+  usage-remove: "&eUsage: /removelives <player> <amount>"
+  usage-set: "&eUsage: /setlives <player> <amount>"
+
+  add-success: "&aYou added &e%amount% &alives to &e%target%&a. (Now: &e%lives%&a)"
+  add-receive: "&aYour lives were increased by &e%player%&a! You now have &e%lives%&a lives."
+
+  remove-success: "&cYou removed &e%amount% &clives from &e%target%&c. (Now: &e%lives%&c)"
+  remove-receive: "&cYour lives were reduced by &e%player%&c! You now have &e%lives%&c lives."
+
+  set-success: "&eYou set &e%target%&e's lives to &e%lives%&e."
+  set-receive: "&eYour lives were set to &e%lives% &eby &e%player%&e."
+
 
 # ─────────────────────────────────────────────────────────
 # MySQL Database Settings
 # If MySQL is disabled, the plugin will automatically use
-# local YAML storage (plugins/3LivesSMP/data.yml)
+# local YAML storage (plugins/LivesSMP/data.yml)
 # ─────────────────────────────────────────────────────────
 mysql:
   enabled: false
   host: "localhost"
   port: 3306
-  database: "threelives"
+  database: "livesmp"
   username: "root"
   password: "password"
 
