@@ -48,7 +48,7 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <finalName>3LivesSMP</finalName>
+        <finalName>3LivesSMP-v${project.version}</finalName>
     </build>
 
     <repositories>

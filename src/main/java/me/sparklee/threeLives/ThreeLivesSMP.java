@@ -26,6 +26,12 @@ public class ThreeLivesSMP extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        String version = getDescription().getVersion();
+
+        getLogger().info("=======================================");
+        getLogger().info("     Enabling 3LivesSMP v" + version);
+        getLogger().info("=======================================");
+
         // Initialize version-aware config manager
         ConfigManager configManager = new ConfigManager(this, "config.yml");
         configManager.load(); // Handles version check, backups, and updates
@@ -46,13 +52,19 @@ public class ThreeLivesSMP extends JavaPlugin {
         getCommand("threelivesreload").setExecutor(new ReloadCommand(this));
         getCommand("threelives").setExecutor(new MainCommand(this));
 
-        getLogger().info("3LivesSMP enabled successfully!");
+        getLogger().info("3LivesSMP v" + version + " has been enabled successfully!");
     }
 
     @Override
     public void onDisable() {
+        String version = getDescription().getVersion();
+
         playerManager.saveData();
         databaseManager.close();
+
+        getLogger().info("=======================================");
+        getLogger().info("     Disabling 3LivesSMP v" + version);
+        getLogger().info("=======================================");
     }
 
     public static ThreeLivesSMP getInstance() {
