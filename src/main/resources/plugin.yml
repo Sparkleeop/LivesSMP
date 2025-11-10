@@ -1,11 +1,11 @@
-name: 3LivesSMP
+name: LivesSMP
 main: me.sparklee.LivesSMP.LivesSMP
-version: 1.2.0
+version: 1.3.0
 api-version: 1.21
 author: Sparklee
 
 commands:
-  threelives:
+  livessmp:
     description: 3LivesSMP main command
     usage: /livessmp <lives|revive|reload>
     aliases: [revive, lives, livessmpreload]
@@ -15,7 +15,7 @@ commands:
   lives:
     description: Check your remaining lives
     usage: /lives
-  threelivesreload:
+  livessmpreload:
     description: Reload 3LivesSMP configuration
     usage: /livessmpreload
   addlives:

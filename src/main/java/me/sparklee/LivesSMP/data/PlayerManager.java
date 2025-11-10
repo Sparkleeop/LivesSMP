@@ -1,6 +1,7 @@
 package me.sparklee.LivesSMP.data;
 
 import me.sparklee.LivesSMP.LivesSMP;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class PlayerManager {
+
     private final LivesSMP plugin;
     private File dataFile;
     private FileConfiguration dataConfig;
@@ -32,46 +34,73 @@ public class PlayerManager {
         }
     }
 
-    public int getLives(Player player) {
-        UUID uuid = player.getUniqueId();
+    // ==================================================
+    //               GET LIVES METHODS
+    // ==================================================
 
-        //  MySQL mode
+    public int getLives(Player player) {
+        return getLives(player.getUniqueId());
+    }
+
+    public int getLives(OfflinePlayer offlinePlayer) {
+        return getLives(offlinePlayer.getUniqueId());
+    }
+
+    public int getLives(UUID uuid) {
+        int defaultLives = plugin.getConfig().getInt("starting-lives", 3);
+
+        // MySQL mode
         if (plugin.getDatabaseManager().isEnabled()) {
             int lives = plugin.getDatabaseManager().getLives(uuid.toString());
             if (lives == -1) {
-                setLives(uuid, 3);
-                return 3;
+                setLives(uuid, defaultLives);
+                return defaultLives;
             }
             return lives;
         }
 
-        //  File mode
-        return dataConfig.getInt("data." + uuid, 3);
+        // File mode
+        return dataConfig.getInt("data." + uuid, defaultLives);
     }
+
+    // ==================================================
+    //               SET LIVES METHODS
+    // ==================================================
 
     public void setLives(Player player, int lives) {
         setLives(player.getUniqueId(), lives);
     }
 
     public void setLives(UUID uuid, int lives) {
-        //  MySQL mode
+        // MySQL mode
         if (plugin.getDatabaseManager().isEnabled()) {
             plugin.getDatabaseManager().setLives(uuid.toString(), lives);
             return;
         }
 
-        //  File mode
+        // File mode
         dataConfig.set("data." + uuid, lives);
         saveData();
     }
 
+    // ==================================================
+    //                 HAS DATA CHECK
+    // ==================================================
+
     public boolean hasData(Player player) {
-        UUID uuid = player.getUniqueId();
+        return hasData(player.getUniqueId());
+    }
+
+    public boolean hasData(UUID uuid) {
         if (plugin.getDatabaseManager().isEnabled()) {
             return plugin.getDatabaseManager().getLives(uuid.toString()) != -1;
         }
         return dataConfig.contains("data." + uuid);
     }
+
+    // ==================================================
+    //             DECREMENT + SAVE HANDLERS
+    // ==================================================
 
     public int decrementLife(Player player) {
         int lives = getLives(player) - 1;

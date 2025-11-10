@@ -58,6 +58,14 @@ public class LivesSMP extends JavaPlugin {
         getCommand("removelives").setExecutor(new RemoveLivesCommand(this));
         getCommand("setlives").setExecutor(new SetLivesCommand(this));
 
+        // Register PlaceholderAPI expansion if PAPI is installed
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new me.sparklee.LivesSMP.utils.LivesExpansion(this).register();
+            getLogger().info("PlaceholderAPI detected — registered placeholders!");
+        } else {
+            getLogger().info("PlaceholderAPI not found — skipping placeholder registration.");
+        }
+
 
         getLogger().info("LivesSMP v" + version + " has been enabled successfully!");
     }

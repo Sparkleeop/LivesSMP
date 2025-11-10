@@ -18,12 +18,20 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        int lives = plugin.getPlayerManager().getLives(player);
 
+        // Configurable starting lives (defaults to 3 if missing)
+        int startingLives = plugin.getConfig().getInt("starting-lives", 3);
+
+        // If the player has no data yet
         if (!plugin.getPlayerManager().hasData(player)) {
-            plugin.getPlayerManager().setLives(player, 3);
-            player.sendMessage(MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e3 lives&a."));
+            plugin.getPlayerManager().setLives(player, startingLives);
+
+            player.sendMessage(MessageManager.formatPlaceholders(
+                    MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e%lives% &alives."),
+                    player.getName(), null, startingLives
+            ));
         } else {
+            int lives = plugin.getPlayerManager().getLives(player);
             player.sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("join-return", "&7Welcome back! You currently have &e%lives% &7lives."),
                     player.getName(), null, lives

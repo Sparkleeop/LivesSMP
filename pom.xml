@@ -6,7 +6,7 @@
 
     <groupId>me.sparklee</groupId>
     <artifactId>LivesSMP</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <name>lives_smp</name>
@@ -48,13 +48,17 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <finalName>3LivesSMP-v${project.version}</finalName>
+        <finalName>LivesSMP-v${project.version}</finalName>
     </build>
 
     <repositories>
         <repository>
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>placeholderapi-repo</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
     </repositories>
 
@@ -63,6 +67,12 @@
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.5-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

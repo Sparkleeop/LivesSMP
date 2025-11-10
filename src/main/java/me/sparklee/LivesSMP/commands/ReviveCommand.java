@@ -2,6 +2,7 @@ package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
 import me.sparklee.LivesSMP.utils.MessageManager;
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.*;
@@ -41,7 +42,29 @@ public class ReviveCommand implements CommandExecutor {
             return true;
         }
 
-        Bukkit.getBanList(org.bukkit.BanList.Type.NAME).pardon(target.getName());
+        //  Get target's current lives (works for both MySQL and YAML)
+        int lives;
+        if (plugin.getDatabaseManager().isEnabled()) {
+            lives = plugin.getDatabaseManager().getLives(target.getUniqueId().toString());
+        } else {
+            lives = plugin.getPlayerManager().getLives(Bukkit.getOfflinePlayer(target.getUniqueId()));
+        }
+
+        // Prevent reviving players who still have lives
+        if (lives > 0) {
+            player.sendMessage(MessageManager.formatPlaceholders(
+                    MessageManager.get("revive-not-zero", "&eThat player still has lives left and cannot be revived!"),
+                    player.getName(), target.getName(), lives
+            ));
+            return true;
+        }
+
+        //  Only proceed if player truly has 0 lives
+        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+        if (banList.isBanned(target.getName())) {
+            banList.pardon(target.getName());
+        }
+
         plugin.getPlayerManager().setLives(target.getUniqueId(), 1);
         held.setAmount(held.getAmount() - 1);
 

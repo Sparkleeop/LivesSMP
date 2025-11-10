@@ -8,7 +8,7 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 2
+config-version: 3
 
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix
@@ -16,6 +16,12 @@ config-version: 2
 # Appears in front of most chat messages sent by this plugin.
 # ─────────────────────────────────────────────────────────
 prefix: "&6[LivesSMP] &f"
+
+# ─────────────────────────────────────────────────────────
+# How many lives new players start with.
+# Default: 3
+# ─────────────────────────────────────────────────────────
+starting-lives: 3
 
 # ─────────────────────────────────────────────────────────
 # Revive Crystal Settings
@@ -71,6 +77,7 @@ messages:
   revive-broadcast: "&#FF9F68⚡ &e%player% &7has revived &b%target% &7using a Revive Crystal!"
   revive-invalid-item: "&cYou must hold a Revive Crystal to use this!"
   revive-invalid-player: "&cThat player has never joined the server!"
+  revive-not-zero: "&eThat player still has lives left and cannot be revived!"
 
   lives-display: "&7You currently have &e%lives% &7lives remaining."
 
