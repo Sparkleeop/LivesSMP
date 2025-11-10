@@ -25,8 +25,9 @@ public class TopLivesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         sender.sendMessage(" ");
-        sender.sendMessage("§6§l[LivesSMP] §7Top Players by Lives:");
+        sender.sendMessage("§6§l§7Top Players by Lives:");
         sender.sendMessage("§7------------------------------------");
+        sender.sendMessage(" ");
 
         if (plugin.getDatabaseManager().isEnabled()) {
             showMySQLLeaderboard(sender);
