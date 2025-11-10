@@ -6,7 +6,7 @@
 
     <groupId>me.sparklee</groupId>
     <artifactId>three_lives</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>three_lives</name>

@@ -98,7 +98,7 @@ public class ReviveItem {
 
         try {
             Bukkit.addRecipe(recipe);
-            plugin.getLogger().info("✅ Revive Crystal recipe registered successfully.");
+            plugin.getLogger().info(" Revive Crystal recipe registered successfully.");
         } catch (Exception e) {
             plugin.getLogger().severe("[3LivesSMP] Failed to register Revive Crystal recipe: " + e.getMessage());
         }

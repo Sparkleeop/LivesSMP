@@ -35,7 +35,7 @@ public class PlayerManager {
     public int getLives(Player player) {
         UUID uuid = player.getUniqueId();
 
-        // ✅ MySQL mode
+        //  MySQL mode
         if (plugin.getDatabaseManager().isEnabled()) {
             int lives = plugin.getDatabaseManager().getLives(uuid.toString());
             if (lives == -1) {
@@ -45,7 +45,7 @@ public class PlayerManager {
             return lives;
         }
 
-        // ✅ File mode
+        //  File mode
         return dataConfig.getInt("data." + uuid, 3);
     }
 
@@ -54,13 +54,13 @@ public class PlayerManager {
     }
 
     public void setLives(UUID uuid, int lives) {
-        // ✅ MySQL mode
+        //  MySQL mode
         if (plugin.getDatabaseManager().isEnabled()) {
             plugin.getDatabaseManager().setLives(uuid.toString(), lives);
             return;
         }
 
-        // ✅ File mode
+        //  File mode
         dataConfig.set("data." + uuid, lives);
         saveData();
     }
