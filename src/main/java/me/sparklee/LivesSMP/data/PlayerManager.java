@@ -35,6 +35,32 @@ public class PlayerManager {
     }
 
     // ==================================================
+    //                 CONFIG HELPERS
+    // ==================================================
+
+    /**
+     * Returns the configured max lives from config.yml
+     * If set to -1, it means there is no limit.
+     */
+    public int getMaxLives() {
+        return plugin.getConfig().getInt("max-lives", 10);
+    }
+
+    /**
+     * Returns true if there is no max-lives limit (-1 in config.yml)
+     */
+    public boolean isUnlimitedLives() {
+        return getMaxLives() == -1;
+    }
+
+    /**
+     * Returns the default starting lives (configurable)
+     */
+    public int getDefaultLives() {
+        return plugin.getConfig().getInt("starting-lives", 3);
+    }
+
+    // ==================================================
     //               GET LIVES METHODS
     // ==================================================
 
@@ -47,7 +73,7 @@ public class PlayerManager {
     }
 
     public int getLives(UUID uuid) {
-        int defaultLives = plugin.getConfig().getInt("starting-lives", 3);
+        int defaultLives = getDefaultLives();
 
         // MySQL mode
         if (plugin.getDatabaseManager().isEnabled()) {
@@ -84,6 +110,46 @@ public class PlayerManager {
     }
 
     // ==================================================
+    //               MODIFY LIVES METHODS
+    // ==================================================
+
+    /**
+     * Increases a player's lives safely, respecting the max-lives limit (unless unlimited)
+     */
+    public int addLives(UUID uuid, int amount) {
+        int current = getLives(uuid);
+        int max = getMaxLives();
+
+        if (!isUnlimitedLives() && current + amount > max) {
+            amount = Math.max(0, max - current);
+        }
+
+        int newLives = isUnlimitedLives() ? current + amount : Math.min(current + amount, max);
+        setLives(uuid, newLives);
+        return newLives;
+    }
+
+    /**
+     * Decreases a player's lives, never below 0
+     */
+    public int removeLives(UUID uuid, int amount) {
+        int current = getLives(uuid);
+        int newLives = Math.max(0, current - amount);
+        setLives(uuid, newLives);
+        return newLives;
+    }
+
+    /**
+     * Decrements 1 life (used on player death)
+     */
+    public int decrementLife(Player player) {
+        int lives = getLives(player) - 1;
+        if (lives < 0) lives = 0;
+        setLives(player, lives);
+        return lives;
+    }
+
+    // ==================================================
     //                 HAS DATA CHECK
     // ==================================================
 
@@ -99,15 +165,8 @@ public class PlayerManager {
     }
 
     // ==================================================
-    //             DECREMENT + SAVE HANDLERS
+    //                   SAVE HANDLER
     // ==================================================
-
-    public int decrementLife(Player player) {
-        int lives = getLives(player) - 1;
-        if (lives < 0) lives = 0;
-        setLives(player, lives);
-        return lives;
-    }
 
     public void saveData() {
         if (plugin.getDatabaseManager().isEnabled()) return;

@@ -20,7 +20,7 @@ public class SetLivesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-        if (!sender.hasPermission("threelives.admin")) {
+        if (!sender.hasPermission("livessmp.admin")) {
             sender.sendMessage(MessageManager.get("no-permission", "&cYou don’t have permission!"));
             return true;
         }
@@ -44,6 +44,17 @@ public class SetLivesCommand implements CommandExecutor {
             return true;
         }
 
+        int maxLives = plugin.getPlayerManager().getMaxLives();
+        boolean unlimited = plugin.getPlayerManager().isUnlimitedLives();
+
+        if (!unlimited && amount > maxLives) {
+            amount = maxLives;
+            sender.sendMessage(MessageManager.formatPlaceholders(
+                    MessageManager.get("max-lives-limit", "&eYou cannot set lives above the maximum of &e%lives%!"),
+                    sender.getName(), target.getName(), maxLives)
+            );
+        }
+
         plugin.getPlayerManager().setLives(target.getUniqueId(), amount);
 
         String senderName = sender instanceof Player ? sender.getName() : "Console";
@@ -60,7 +71,6 @@ public class SetLivesCommand implements CommandExecutor {
             );
         }
 
-        // Console Log
         plugin.getLogger().info("[Admin] " + senderName + " set " + target.getName() + "'s lives to " + amount);
 
         return true;

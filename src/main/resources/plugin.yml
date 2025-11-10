@@ -1,12 +1,12 @@
 name: LivesSMP
 main: me.sparklee.LivesSMP.LivesSMP
-version: 2.0.0
+version: 2.0.1
 api-version: 1.21
 author: Sparklee
 
 commands:
   livessmp:
-    description: 3LivesSMP main command
+    description: LivesSMP main command
     usage: /livessmp <lives|revive|reload>
     aliases: [revive, lives, livessmpreload]
   revive:

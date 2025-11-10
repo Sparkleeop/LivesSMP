@@ -8,7 +8,7 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 4
+config-version: 5
 
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix
@@ -31,6 +31,13 @@ life-steal:
   enabled: true
   amount: 1
   broadcast: true
+
+# ─────────────────────────────────────────────────────────
+# Maximum lives a player can have.
+# Once this limit is reached, they cannot gain more lives.
+# Set this to -1 to allow players to have unlimited lives.
+# ─────────────────────────────────────────────────────────
+max-lives: 10
 
 # ─────────────────────────────────────────────────────────
 # Revive Crystal Settings
@@ -109,6 +116,9 @@ messages:
   life-steal-gain: "&aYou stole &e%amount% &alife(s) from &e%target%! &7(You now have &e%lives%&7)"
   life-steal-loss: "&cYou lost &e%amount% &clife(s) to &e%player%! &7(You now have &e%lives%&7)"
   life-steal-broadcast: "&#FF9F68⚔ &e%player% &7stole &c%amount% &7life(s) from &e%target%!"
+
+  max-lives-reached: "&e%target% &aalready has the maximum of &e%lives% &alives!"
+  max-lives-limit: "&eYou cannot set lives above the maximum of &e%lives%!"
 
 
 # ─────────────────────────────────────────────────────────

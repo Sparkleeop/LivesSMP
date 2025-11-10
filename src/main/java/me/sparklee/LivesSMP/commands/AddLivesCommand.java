@@ -47,6 +47,18 @@ public class AddLivesCommand implements CommandExecutor {
         int current = plugin.getPlayerManager().getLives(
                 target.isOnline() ? target.getPlayer() : Bukkit.getPlayer(target.getUniqueId()));
         int newLives = current + amount;
+
+        int maxLives = plugin.getPlayerManager().getMaxLives();
+        boolean unlimited = plugin.getPlayerManager().isUnlimitedLives();
+
+        if (!unlimited && newLives > maxLives) {
+            newLives = maxLives;
+            sender.sendMessage(MessageManager.formatPlaceholders(
+                    MessageManager.get("max-lives-reached", "&e%target% &aalready has the maximum of &e%lives% &alives!"),
+                    sender.getName(), target.getName(), maxLives)
+            );
+        }
+
         plugin.getPlayerManager().setLives(target.getUniqueId(), newLives);
 
         String senderName = sender instanceof Player ? sender.getName() : "Console";
@@ -63,7 +75,6 @@ public class AddLivesCommand implements CommandExecutor {
             );
         }
 
-        // Console Log
         plugin.getLogger().info("[Admin] " + senderName + " added " + amount + " lives to " + target.getName() + " (now " + newLives + ")");
 
         return true;
