@@ -156,4 +156,10 @@ public class DatabaseManager {
             plugin.getLogger().warning("Error closing MySQL connection: " + e.getMessage());
         }
     }
+
+    public Connection getConnection() {
+        ensureConnection();
+        return connection;
+    }
+
 }

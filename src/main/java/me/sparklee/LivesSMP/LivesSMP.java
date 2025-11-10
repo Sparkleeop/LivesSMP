@@ -15,6 +15,8 @@ import me.sparklee.LivesSMP.utils.ConfigManager;
 import me.sparklee.LivesSMP.commands.AddLivesCommand;
 import me.sparklee.LivesSMP.commands.RemoveLivesCommand;
 import me.sparklee.LivesSMP.commands.SetLivesCommand;
+import me.sparklee.LivesSMP.events.PlayerKillListener;
+import me.sparklee.LivesSMP.commands.TopLivesCommand;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,6 +51,7 @@ public class LivesSMP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerKillListener(this), this);
 
         getCommand("revive").setExecutor(new ReviveCommand(this));
         getCommand("lives").setExecutor(new LivesCommand(this));
@@ -57,6 +60,7 @@ public class LivesSMP extends JavaPlugin {
         getCommand("addlives").setExecutor(new AddLivesCommand(this));
         getCommand("removelives").setExecutor(new RemoveLivesCommand(this));
         getCommand("setlives").setExecutor(new SetLivesCommand(this));
+        getCommand("toplives").setExecutor(new TopLivesCommand(this));
 
         // Register PlaceholderAPI expansion if PAPI is installed
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {

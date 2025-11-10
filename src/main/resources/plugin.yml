@@ -1,6 +1,6 @@
 name: LivesSMP
 main: me.sparklee.LivesSMP.LivesSMP
-version: 1.3.0
+version: 2.0.0
 api-version: 1.21
 author: Sparklee
 
@@ -30,6 +30,9 @@ commands:
   checklives:
     description: Check another player’s lives
     usage: /checklives <player>
+  toplives:
+    description: Shows the top players with the most lives
+    usage: /toplives
 
 permissions:
   livessmp.admin:

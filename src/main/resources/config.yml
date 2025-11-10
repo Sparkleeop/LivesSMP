@@ -8,7 +8,7 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 3
+config-version: 4
 
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix
@@ -22,6 +22,15 @@ prefix: "&6[LivesSMP] &f"
 # Default: 3
 # ─────────────────────────────────────────────────────────
 starting-lives: 3
+
+# ─────────────────────────────────────────────────────────
+# Life Steal Settings
+# When a player kills another player, they steal lives.
+# ─────────────────────────────────────────────────────────
+life-steal:
+  enabled: true
+  amount: 1
+  broadcast: true
 
 # ─────────────────────────────────────────────────────────
 # Revive Crystal Settings
@@ -96,6 +105,10 @@ messages:
 
   set-success: "&eYou set &e%target%&e's lives to &e%lives%&e."
   set-receive: "&eYour lives were set to &e%lives% &eby &e%player%&e."
+
+  life-steal-gain: "&aYou stole &e%amount% &alife(s) from &e%target%! &7(You now have &e%lives%&7)"
+  life-steal-loss: "&cYou lost &e%amount% &clife(s) to &e%player%! &7(You now have &e%lives%&7)"
+  life-steal-broadcast: "&#FF9F68⚔ &e%player% &7stole &c%amount% &7life(s) from &e%target%!"
 
 
 # ─────────────────────────────────────────────────────────
