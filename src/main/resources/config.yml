@@ -8,7 +8,15 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 5
+config-version: 6
+
+# ───────────────────────────────────────────────
+# Update Checker
+# Set to false to disable update checks.
+# Notifies console + OPs when a new version is available.
+# ───────────────────────────────────────────────
+check-for-updates: true
+
 
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix

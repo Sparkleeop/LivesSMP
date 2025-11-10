@@ -17,6 +17,7 @@ import me.sparklee.LivesSMP.commands.RemoveLivesCommand;
 import me.sparklee.LivesSMP.commands.SetLivesCommand;
 import me.sparklee.LivesSMP.events.PlayerKillListener;
 import me.sparklee.LivesSMP.commands.TopLivesCommand;
+import me.sparklee.LivesSMP.utils.UpdateChecker;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,6 +49,15 @@ public class LivesSMP extends JavaPlugin {
         reviveItem = new ReviveItem(this);
         MessageManager.load();
 
+        // Check for updates on Spigot
+        new me.sparklee.LivesSMP.utils.UpdateChecker(this, 130095).checkForUpdates();
+        if (getConfig().getBoolean("check-for-updates", true)) {
+            UpdateChecker checker = new UpdateChecker(this, 130095);
+            getServer().getPluginManager().registerEvents(checker, this);
+            checker.checkForUpdates();
+        }
+
+
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
@@ -65,9 +75,9 @@ public class LivesSMP extends JavaPlugin {
         // Register PlaceholderAPI expansion if PAPI is installed
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new me.sparklee.LivesSMP.utils.LivesExpansion(this).register();
-            getLogger().info("PlaceholderAPI detected — registered placeholders!");
+            getLogger().info("PlaceholderAPI detected - registered placeholders!");
         } else {
-            getLogger().info("PlaceholderAPI not found — skipping placeholder registration.");
+            getLogger().info("PlaceholderAPI not found - skipping placeholder registration.");
         }
 
 
