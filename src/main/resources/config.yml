@@ -17,7 +17,6 @@ config-version: 6
 # ───────────────────────────────────────────────
 check-for-updates: true
 
-
 # ─────────────────────────────────────────────────────────
 # Plugin message prefix
 # Supports '&' color codes (e.g., &6 = gold, &f = white)
