@@ -8,7 +8,7 @@
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 6
+config-version: 7
 
 # ───────────────────────────────────────────────
 # Update Checker
@@ -31,6 +31,18 @@ prefix: "&6[LivesSMP] &f"
 starting-lives: 3
 
 # ─────────────────────────────────────────────────────────
+# Temporary Ban Settings
+# When enabled, players with 0 lives will be banned for a limited time
+# instead of permanently.
+# duration: how long the ban lasts (in minutes)
+# Supported units: m = minutes, h = hours, d = days
+# Example: "30m", "2h", "1d"
+# ─────────────────────────────────────────────────────────
+temporary-ban:
+  enabled: false
+  duration: "1h"
+
+# ─────────────────────────────────────────────────────────
 # Life Steal Settings
 # When a player kills another player, they steal lives.
 # ─────────────────────────────────────────────────────────
@@ -45,6 +57,16 @@ life-steal:
 # Set this to -1 to allow players to have unlimited lives.
 # ─────────────────────────────────────────────────────────
 max-lives: 10
+
+# ─────────────────────────────────────────────────────────
+# ActionBar Display
+# Continuously shows a player's current lives in the action bar.
+# Set enabled: false to disable.
+# interval-ticks = update frequency (20 ticks = 1 second)
+# ─────────────────────────────────────────────────────────
+actionbar:
+  enabled: true
+  interval-ticks: 60
 
 # ─────────────────────────────────────────────────────────
 # Revive Crystal Settings
@@ -87,6 +109,7 @@ revive-crystal:
 
 # ─────────────────────────────────────────────────────────
 # Plugin Messages
+# Supports & color codes and hex colors using &#RRGGBB (e.g. &#FF9F68)
 # ─────────────────────────────────────────────────────────
 messages:
   join-new: "&aWelcome to Lives SMP! You’ve been given &e3 lives&a."
@@ -127,11 +150,14 @@ messages:
   max-lives-reached: "&e%target% &aalready has the maximum of &e%lives% &alives!"
   max-lives-limit: "&eYou cannot set lives above the maximum of &e%lives%!"
 
+  ban-temp-message: "&c☠ You’ve lost all your lives! &7You are banned for a limited time."
+  ban-permanent-message: "&c☠ You’ve lost all your lives! &7You are now banned until someone revives you."
 
 # ─────────────────────────────────────────────────────────
 # MySQL Database Settings
 # If MySQL is disabled, the plugin will automatically use
 # local YAML storage (plugins/LivesSMP/data.yml)
+# ⚠ Ensure your database is running and accessible before enabling MySQL.
 # ─────────────────────────────────────────────────────────
 mysql:
   enabled: false

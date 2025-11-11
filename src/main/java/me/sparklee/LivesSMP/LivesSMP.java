@@ -72,6 +72,13 @@ public class LivesSMP extends JavaPlugin {
         getCommand("setlives").setExecutor(new SetLivesCommand(this));
         getCommand("toplives").setExecutor(new TopLivesCommand(this));
 
+        // Start ActionBar life display
+        if (getConfig().getBoolean("actionbar.enabled", true)) {
+            int interval = getConfig().getInt("actionbar.interval-ticks", 60);
+            getServer().getScheduler().runTaskTimerAsynchronously(this, new me.sparklee.LivesSMP.tasks.ActionBarTask(this), 0L, interval);
+            getLogger().info("ActionBar life display enabled (interval: " + interval + " ticks)");
+        }
+
         // Register PlaceholderAPI expansion if PAPI is installed
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new me.sparklee.LivesSMP.utils.LivesExpansion(this).register();
