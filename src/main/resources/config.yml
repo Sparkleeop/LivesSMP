@@ -124,6 +124,7 @@ messages:
   revive-invalid-item: "&cYou must hold a Revive Crystal to use this!"
   revive-invalid-player: "&cThat player has never joined the server!"
   revive-not-zero: "&eThat player still has lives left and cannot be revived!"
+  auto-revive: "&aYou were revived and restored to &e%lives% &alives!"
 
   lives-display: "&7You currently have &e%lives% &7lives remaining."
 
