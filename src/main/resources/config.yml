@@ -1,7 +1,7 @@
 ###########################################################
 #                  LivesSMP Configuration                 #
 #       Created by Sparklee | https://www.spigotmc.org/members/sparklee.1696271/         #
-#   For help with Material names, see:                    #
+#   For help with Mat~erial names, see:                    #
 #   https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 ###########################################################
 
@@ -108,6 +108,20 @@ revive-crystal:
     S: TOTEM_OF_UNDYING
 
 # ─────────────────────────────────────────────────────────
+# Life Withdrawal System
+# Lets players withdraw their lives into a physical item that can be traded or stored.
+# ─────────────────────────────────────────────────────────
+life-withdraw:
+  enabled: true
+  min-lives: 1       # Prevents players from withdrawing if they’ll have 0 or less left
+  item:
+    material: HEART_OF_THE_SEA
+    name: "&#FF4C4C❤ Life Shard"
+    lore:
+      - "&7Redeem this to gain &e1 life&7."
+      - "&8Obtained from /withdrawlife"
+
+# ─────────────────────────────────────────────────────────
 # Plugin Messages
 # Supports & color codes and hex colors using &#RRGGBB (e.g. &#FF9F68)
 # ─────────────────────────────────────────────────────────
@@ -153,6 +167,11 @@ messages:
 
   ban-temp-message: "&c☠ You’ve lost all your lives! &7You are banned for a limited time."
   ban-permanent-message: "&c☠ You’ve lost all your lives! &7You are now banned until someone revives you."
+
+  withdraw-success: "&aYou withdrew &e%lives% &alives into Life Shards!"
+  withdraw-usage: "&eUsage: /withdrawlife <amount>"
+  withdraw-too-low: "&cYou cannot withdraw that many lives!"
+  life-shard-redeem: "&aYou redeemed a Life Shard and gained &e%lives% &alives!"
 
 # ─────────────────────────────────────────────────────────
 # MySQL Database Settings

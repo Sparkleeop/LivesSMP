@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.sql.*;
 
 public class DatabaseManager {
+
     private final LivesSMP plugin;
     private Connection connection;
     private boolean enabled = false;
@@ -30,19 +31,22 @@ public class DatabaseManager {
         username = plugin.getConfig().getString("mysql.username");
         password = plugin.getConfig().getString("mysql.password");
 
-        try {
-            connection = DriverManager.getConnection(
-                    "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true",
-                    username, password
-            );
-            plugin.getLogger().info("✅ Connected to MySQL successfully!");
-            enabled = true;
-            setupTable();
-            startKeepAlive();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("❌ Failed to connect to MySQL: " + e.getMessage());
-            enabled = false;
-        }
+        // Connect + setup on async thread — safe at startup before players join
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                connection = DriverManager.getConnection(
+                        "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true",
+                        username, password
+                );
+                setupTable();
+                enabled = true;
+                plugin.getLogger().info("✅ Connected to MySQL successfully!");
+                startKeepAlive();
+            } catch (SQLException e) {
+                plugin.getLogger().severe("❌ Failed to connect to MySQL: " + e.getMessage());
+                enabled = false;
+            }
+        });
     }
 
     private void setupTable() {
@@ -55,9 +59,6 @@ public class DatabaseManager {
         }
     }
 
-    /**
-     * Keeps the MySQL connection alive every 5 minutes.
-     */
     private void startKeepAlive() {
         new BukkitRunnable() {
             @Override
@@ -77,12 +78,9 @@ public class DatabaseManager {
                     reconnect();
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20L * 60 * 5, 20L * 60 * 5); // every 5 min
+        }.runTaskTimerAsynchronously(plugin, 20L * 60 * 5, 20L * 60 * 5);
     }
 
-    /**
-     * Checks if the connection is valid.
-     */
     private boolean isConnected() {
         try {
             return connection != null && connection.isValid(2);
@@ -91,9 +89,6 @@ public class DatabaseManager {
         }
     }
 
-    /**
-     * Attempts to reconnect safely.
-     */
     private synchronized void reconnect() {
         try {
             if (connection != null && !connection.isClosed()) connection.close();
@@ -124,12 +119,14 @@ public class DatabaseManager {
     public int getLives(String uuid) {
         if (!enabled) return -1;
         ensureConnection();
-        try (PreparedStatement ps = connection.prepareStatement("SELECT lives FROM player_lives WHERE uuid=?")) {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT lives FROM player_lives WHERE uuid=?"
+        )) {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt("lives");
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("[LivesSMP] getLives() SQL error: " + e.getMessage());
+            plugin.getLogger().severe("[LivesSMP] getLives() SQL error: " + e.getMessage());
         }
         return -1;
     }
@@ -145,7 +142,7 @@ public class DatabaseManager {
             ps.setInt(3, lives);
             ps.executeUpdate();
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("[LivesSMP] setLives() SQL error: " + e.getMessage());
+            plugin.getLogger().severe("[LivesSMP] setLives() SQL error: " + e.getMessage());
         }
     }
 
@@ -161,5 +158,4 @@ public class DatabaseManager {
         ensureConnection();
         return connection;
     }
-
 }

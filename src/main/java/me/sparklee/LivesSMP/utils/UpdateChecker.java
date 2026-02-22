@@ -63,7 +63,7 @@ public class UpdateChecker implements Listener {
                 player.sendMessage("§7You are running §f" + plugin.getDescription().getVersion() + " §7but §a" + latestVersion + " §7is available.");
                 player.sendMessage("§eDownload it here: §fhttps://www.spigotmc.org/resources/" + resourceId);
                 player.sendMessage("§8§m--------------------------------------------------");
-            }, 60L); // wait 3 seconds after join
+            }, 60L);
         }
     }
 }

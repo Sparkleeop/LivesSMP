@@ -11,19 +11,12 @@ public class MessageManager {
         config = LivesSMP.getInstance().getConfig();
     }
 
-    /**
-     * Get a message by path from config.yml (under "messages.")
-     * If missing, returns a default fallback.
-     */
     public static String get(String path, String fallback) {
         if (config == null) load();
         String value = config.getString("messages." + path, fallback);
         return Messages.format(value);
     }
 
-    /**
-     * Replaces placeholders like %player%, %target%, %lives%, etc.
-     */
     public static String formatPlaceholders(String message, String player, String target, int lives) {
         return message
                 .replace("%player%", player == null ? "" : player)

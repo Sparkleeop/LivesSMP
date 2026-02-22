@@ -18,24 +18,18 @@ public class ReviveItem {
     public ReviveItem(LivesSMP plugin) {
         this.plugin = plugin;
 
-        // Create the base item
         reviveCrystal = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta = reviveCrystal.getItemMeta();
         meta.setDisplayName("§dRevive Crystal");
         meta.setLore(java.util.List.of("§7Use this to revive a banned player."));
 
-        // Add NBT tag
         NamespacedKey key = new NamespacedKey(plugin, "revive_crystal");
         meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
         reviveCrystal.setItemMeta(meta);
 
-        // Register recipe safely
         registerRecipe();
     }
 
-    /**
-     * Safely registers the custom revive crystal recipe from config.yml
-     */
     private void registerRecipe() {
         if (!plugin.getConfig().getBoolean("revive-crystal.enabled")) {
             plugin.getLogger().info("Revive Crystal crafting disabled via config.");
@@ -50,7 +44,6 @@ public class ReviveItem {
 
         var shape = plugin.getConfig().getStringList("revive-crystal.shape");
 
-        // Validate shape
         if (shape == null || shape.size() != 3) {
             plugin.getLogger().severe("[LivesSMP] Invalid revive-crystal shape! Must have exactly 3 lines.");
             return;
@@ -66,7 +59,6 @@ public class ReviveItem {
         ShapedRecipe recipe = new ShapedRecipe(key, result);
         recipe.shape(shape.get(0), shape.get(1), shape.get(2));
 
-        // Validate ingredients
         ConfigurationSection ingredients = plugin.getConfig().getConfigurationSection("revive-crystal.ingredients");
         if (ingredients == null) {
             plugin.getLogger().severe("[LivesSMP] revive-crystal.ingredients missing in config!");
@@ -104,9 +96,6 @@ public class ReviveItem {
         }
     }
 
-    /**
-     * Removes the current recipe and reloads a new one.
-     */
     public void reloadRecipe() {
         try {
             Bukkit.removeRecipe(new NamespacedKey(plugin, "revive_crystal_recipe"));

@@ -26,12 +26,10 @@ public class DeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
 
-        // Skip if player has bypass permission
         if (player.hasPermission("livessmp.bypass")) return;
 
         int lives = plugin.getPlayerManager().decrementLife(player);
 
-        // Player lost all lives
         if (lives <= 0) {
             boolean tempBanEnabled = plugin.getConfig().getBoolean("temporary-ban.enabled", false);
             String durationStr = plugin.getConfig().getString("temporary-ban.duration", "1h");
@@ -48,18 +46,15 @@ public class DeathListener implements Listener {
                         "&c☠ You’ve lost all 3 of your lives!\n&7You are now banned until someone revives you.");
             }
 
-            // Apply ban
             BanList banList = Bukkit.getBanList(BanList.Type.NAME);
             banList.addBan(player.getName(), banReason, expires, "LivesSMP");
 
-            // Kick player
             player.kickPlayer(kickMessage);
 
             plugin.getLogger().info(player.getName() + " was "
                     + (tempBanEnabled ? "temporarily" : "permanently")
                     + " banned for losing all lives.");
         } else {
-            // Player still has lives remaining
             player.sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("life-lost", "&cYou lost a life! &7Lives remaining: &e%lives%"),
                     player.getName(), null, lives
@@ -67,9 +62,7 @@ public class DeathListener implements Listener {
         }
     }
 
-    /**
-     * Parses duration strings like "30m", "2h", "1d" into a Date.
-     */
+    // Parses duration strings like "30m", "2h", "1d" into a Date. (IT WAS ANNOYING TO ADD)
     private Date parseDuration(String input) {
         Pattern pattern = Pattern.compile("(\\d+)([mhd])", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(input);

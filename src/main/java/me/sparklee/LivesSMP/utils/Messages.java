@@ -8,12 +8,8 @@ import java.util.regex.Pattern;
 
 public class Messages {
 
-    // Matches &#RRGGBB or <#RRGGBB>
     private static final Pattern HEX_PATTERN = Pattern.compile("(?i)(<#[0-9A-F]{6}>|&#[0-9A-F]{6})");
 
-    /**
-     * Converts all hex colors in the message (&#RRGGBB or <#RRGGBB>) to the Bukkit §x§R§R§G§G§B§B format.
-     */
     private static String applyHexColors(String message) {
         Matcher matcher = HEX_PATTERN.matcher(message);
         StringBuffer buffer = new StringBuffer();
@@ -37,29 +33,19 @@ public class Messages {
         return buffer.toString();
     }
 
-    /**
-     * Fetches prefix from config.yml
-     */
+
     public static String prefix() {
         String rawPrefix = LivesSMP.getInstance().getConfig().getString("prefix", "&6[LivesSMP] &f");
         return format(rawPrefix, false);
     }
 
-    /**
-     * Formats a message with prefix and color translation.
-     */
     public static String format(String message) {
         return format(message, true);
     }
 
     private static String format(String message, boolean includePrefix) {
-        // 1. Apply custom hex codes
         String processed = applyHexColors(message);
-
-        // 2. Translate normal & codes
         processed = ChatColor.translateAlternateColorCodes('&', processed);
-
-        // 3. Optionally add prefix
         return includePrefix ? prefix() + processed : processed;
     }
 }

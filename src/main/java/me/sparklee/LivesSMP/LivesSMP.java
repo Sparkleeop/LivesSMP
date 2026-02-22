@@ -18,6 +18,9 @@ import me.sparklee.LivesSMP.commands.SetLivesCommand;
 import me.sparklee.LivesSMP.events.PlayerKillListener;
 import me.sparklee.LivesSMP.commands.TopLivesCommand;
 import me.sparklee.LivesSMP.utils.UpdateChecker;
+import me.sparklee.LivesSMP.events.LifeShardListener;
+import me.sparklee.LivesSMP.commands.WithdrawLifeCommand;
+import me.sparklee.LivesSMP.commands.CheckLivesCommand;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -38,9 +41,8 @@ public class LivesSMP extends JavaPlugin {
         getLogger().info("     Enabling LivesSMP v" + version);
         getLogger().info("=======================================");
 
-        // Initialize version-aware config manager
         ConfigManager configManager = new ConfigManager(this, "config.yml");
-        configManager.load(); // Handles version check, backups, and updates
+        configManager.load();
 
         databaseManager = new DatabaseManager(this);
         databaseManager.connect();
@@ -50,7 +52,6 @@ public class LivesSMP extends JavaPlugin {
         MessageManager.load();
 
         // Check for updates on Spigot
-        new me.sparklee.LivesSMP.utils.UpdateChecker(this, 130095).checkForUpdates();
         if (getConfig().getBoolean("check-for-updates", true)) {
             UpdateChecker checker = new UpdateChecker(this, 130095);
             getServer().getPluginManager().registerEvents(checker, this);
@@ -62,6 +63,7 @@ public class LivesSMP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerKillListener(this), this);
+        getServer().getPluginManager().registerEvents(new LifeShardListener(this), this);
 
         getCommand("revive").setExecutor(new ReviveCommand(this));
         getCommand("lives").setExecutor(new LivesCommand(this));
@@ -71,15 +73,15 @@ public class LivesSMP extends JavaPlugin {
         getCommand("removelives").setExecutor(new RemoveLivesCommand(this));
         getCommand("setlives").setExecutor(new SetLivesCommand(this));
         getCommand("toplives").setExecutor(new TopLivesCommand(this));
+        getCommand("withdrawlife").setExecutor(new WithdrawLifeCommand(this));
+        getCommand("checklives").setExecutor(new CheckLivesCommand(this));
 
-        // Start ActionBar life display
         if (getConfig().getBoolean("actionbar.enabled", true)) {
             int interval = getConfig().getInt("actionbar.interval-ticks", 60);
             getServer().getScheduler().runTaskTimerAsynchronously(this, new me.sparklee.LivesSMP.tasks.ActionBarTask(this), 0L, interval);
             getLogger().info("ActionBar life display enabled (interval: " + interval + " ticks)");
         }
 
-        // Register PlaceholderAPI expansion if PAPI is installed
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new me.sparklee.LivesSMP.utils.LivesExpansion(this).register();
             getLogger().info("PlaceholderAPI detected - registered placeholders!");

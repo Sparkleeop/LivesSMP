@@ -20,7 +20,7 @@ public class RemoveLivesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-        if (!sender.hasPermission("lives.admin")) {
+        if (!sender.hasPermission("livessmp.admin")) {
             sender.sendMessage(MessageManager.get("no-permission", "&cYou don’t have permission!"));
             return true;
         }

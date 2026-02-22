@@ -23,15 +23,13 @@ public class ReviveCommand implements CommandExecutor {
             sender.sendMessage(MessageManager.get("only-player", "&cOnly players can use this command!"));
             return true;
         }
-
         if (args.length != 1) {
             player.sendMessage(MessageManager.get("revive-usage", "&cUsage: /revive <player>"));
             return true;
         }
 
         ItemStack held = player.getInventory().getItemInMainHand();
-        if (!held.hasItemMeta() || held.getItemMeta().getDisplayName() == null ||
-                !held.getItemMeta().getDisplayName().equals("§dRevive Crystal")) {
+        if (!held.hasItemMeta() || !plugin.getReviveItem().isReviveCrystal(held)) {
             player.sendMessage(MessageManager.get("revive-invalid-item", "&cYou must hold a Revive Crystal to use this!"));
             return true;
         }
@@ -42,52 +40,50 @@ public class ReviveCommand implements CommandExecutor {
             return true;
         }
 
-        //  Get target's current lives (works for both MySQL and YAML)
-        int lives;
         if (plugin.getDatabaseManager().isEnabled()) {
-            lives = plugin.getDatabaseManager().getLives(target.getUniqueId().toString());
+            String targetUuid = target.getUniqueId().toString();
+            String targetName = target.getName();
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                int lives = plugin.getDatabaseManager().getLives(targetUuid);
+                Bukkit.getScheduler().runTask(plugin, () -> finishRevive(player, target, lives));
+            });
         } else {
-            lives = plugin.getPlayerManager().getLives(Bukkit.getOfflinePlayer(target.getUniqueId()));
+            int lives = plugin.getPlayerManager().getLives(target.getUniqueId());
+            finishRevive(player, target, lives);
         }
+        return true;
+    }
 
-        // Prevent reviving players who still have lives
+    private void finishRevive(Player player, OfflinePlayer target, int lives) {
         if (lives > 0) {
             player.sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("revive-not-zero", "&eThat player still has lives left and cannot be revived!"),
                     player.getName(), target.getName(), lives
             ));
-            return true;
+            return;
         }
 
-        //  Only proceed if player truly has 0 lives
         BanList banList = Bukkit.getBanList(BanList.Type.NAME);
-        if (banList.isBanned(target.getName())) {
-            banList.pardon(target.getName());
-        }
+        if (banList.isBanned(target.getName())) banList.pardon(target.getName());
 
         plugin.getPlayerManager().setLives(target.getUniqueId(), 1);
+
+        ItemStack held = player.getInventory().getItemInMainHand();
         held.setAmount(held.getAmount() - 1);
 
-        // Broadcast
         Bukkit.broadcastMessage(MessageManager.formatPlaceholders(
                 MessageManager.get("revive-broadcast", "&#FF9F68⚡ &e%player% &7has revived &b%target% &7using a Revive Crystal!"),
                 player.getName(), target.getName(), 0
         ));
-
-        // Sender message
         player.sendMessage(MessageManager.formatPlaceholders(
                 MessageManager.get("revive-success", "&aYou revived &e%target%&a!"),
                 player.getName(), target.getName(), 0
         ));
-
-        // Target message
-        if (target.isOnline()) {
+        if (target.isOnline() && target.getPlayer() != null) {
             target.getPlayer().sendMessage(MessageManager.formatPlaceholders(
-                    MessageManager.get("revive-target", "&aYou’ve been revived by &e%player%&a!"),
+                    MessageManager.get("revive-target", "&aYou've been revived by &e%player%&a!"),
                     player.getName(), target.getName(), 0
             ));
         }
-
-        return true;
     }
 }

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class JoinListener implements Listener {
 
@@ -20,22 +21,37 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
         int startingLives = plugin.getConfig().getInt("starting-lives", 3);
-        int lives = plugin.getPlayerManager().getLives(player);
 
-        // If the player has no data yet
-        if (!plugin.getPlayerManager().hasData(player)) {
-            plugin.getPlayerManager().setLives(player, startingLives);
-
-            player.sendMessage(MessageManager.formatPlaceholders(
-                    MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e%lives% &alives."),
-                    player.getName(), null, startingLives
-            ));
+        if (!plugin.getDatabaseManager().isEnabled()) {
+            plugin.getPlayerManager().loadPlayer(player.getUniqueId());
+            int lives = plugin.getPlayerManager().getLives(player);
+            handleJoin(player, lives, startingLives);
             return;
         }
 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            int lives = plugin.getDatabaseManager().getLives(player.getUniqueId().toString());
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (!player.isOnline()) return;
+
+                if (lives == -1) {
+                    plugin.getPlayerManager().setLives(player, startingLives);
+                    player.sendMessage(MessageManager.formatPlaceholders(
+                            MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e%lives% &alives."),
+                            player.getName(), null, startingLives
+                    ));
+                } else {
+                    plugin.getPlayerManager().setLives(player.getUniqueId(), lives);
+                    handleJoin(player, lives, startingLives);
+                }
+            });
+        });
+    }
+
+    private void handleJoin(Player player, int lives, int startingLives) {
         BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+
         if (lives <= 0 && !banList.isBanned(player.getName())) {
             plugin.getPlayerManager().setLives(player, startingLives);
             player.sendMessage(MessageManager.formatPlaceholders(
@@ -46,10 +62,14 @@ public class JoinListener implements Listener {
             return;
         }
 
-        // Normal join message
         player.sendMessage(MessageManager.formatPlaceholders(
                 MessageManager.get("join-return", "&7Welcome back! You currently have &e%lives% &7lives."),
                 player.getName(), null, lives
         ));
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        plugin.getPlayerManager().unload(event.getPlayer().getUniqueId());
     }
 }

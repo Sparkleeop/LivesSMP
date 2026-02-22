@@ -21,7 +21,6 @@ public class ActionBarTask implements Runnable {
         for (Player player : Bukkit.getOnlinePlayers()) {
             int lives = plugin.getPlayerManager().getLives(player);
 
-            // Display format: ❤x<lives> in red (#FF0000)
             Component message = Component.text("❤ x" + lives)
                     .color(TextColor.color(0xFF0000));
 

@@ -1,6 +1,6 @@
 name: LivesSMP
 main: me.sparklee.LivesSMP.LivesSMP
-version: 2.1.0
+version: 2.2.0
 api-version: 1.21
 author: Sparklee
 
@@ -33,6 +33,9 @@ commands:
   toplives:
     description: Shows the top players with the most lives
     usage: /toplives
+  withdrawlife:
+    description: Withdraw your lives into a Life Shard item
+    usage: /withdrawlife <amount>
 
 permissions:
   livessmp.admin:
@@ -44,4 +47,7 @@ permissions:
   livessmp.check:
     description: Allows checking other players' lives
     default: op
+  livessmp.withdraw:
+    description: Allows withdrawing lives into items
+    default: true
 

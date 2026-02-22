@@ -41,27 +41,31 @@ public class TopLivesCommand implements CommandExecutor {
     }
 
     private void showMySQLLeaderboard(CommandSender sender) {
-        try (PreparedStatement ps = plugin.getDatabaseManager().getConnection().prepareStatement(
-                "SELECT uuid, lives FROM player_lives ORDER BY lives DESC LIMIT 10"
-        )) {
-            ResultSet rs = ps.executeQuery();
-
-            int rank = 1;
-            while (rs.next()) {
-                UUID uuid = UUID.fromString(rs.getString("uuid"));
-                int lives = rs.getInt("lives");
-
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                String name = player != null && player.getName() != null ? player.getName() : "Unknown";
-
-                sender.sendMessage("§e#" + rank + " §f" + name + " §7— §c" + lives + " ♥");
-                rank++;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            List<String> lines = new ArrayList<>();
+            try (PreparedStatement ps = plugin.getDatabaseManager().getConnection().prepareStatement(
+                    "SELECT uuid, lives FROM player_lives ORDER BY lives DESC LIMIT 10"
+            )) {
+                ResultSet rs = ps.executeQuery();
+                int rank = 1;
+                while (rs.next()) {
+                    UUID uuid = UUID.fromString(rs.getString("uuid"));
+                    int lives = rs.getInt("lives");
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                    String name = player.getName() != null ? player.getName() : "Unknown";
+                    lines.add("§e#" + rank + " §f" + name + " §7— §c" + lives + " ♥");
+                    rank++;
+                }
+            } catch (Exception e) {
+                plugin.getLogger().severe("[LivesSMP] Failed to fetch MySQL leaderboard: " + e.getMessage());
+                Bukkit.getScheduler().runTask(plugin, () ->
+                        sender.sendMessage(MessageManager.get("leaderboard-error", "&cFailed to load leaderboard! Check console."))
+                );
+                return;
             }
 
-        } catch (Exception e) {
-            sender.sendMessage(MessageManager.get("leaderboard-error", "&cFailed to load leaderboard! Check console."));
-            plugin.getLogger().severe("[LivesSMP] Failed to fetch MySQL leaderboard: " + e.getMessage());
-        }
+            Bukkit.getScheduler().runTask(plugin, () -> lines.forEach(sender::sendMessage));
+        });
     }
 
     private void showYAMLLeaderboard(CommandSender sender) {

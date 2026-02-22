@@ -37,12 +37,8 @@ public class CheckLivesCommand implements CommandExecutor {
         }
 
         int lives;
-        if (target.isOnline() && target.getPlayer() != null) {
-            lives = plugin.getPlayerManager().getLives(target.getPlayer());
-        } else {
-            lives = plugin.getPlayerManager().getLives(Bukkit.getPlayer(target.getUniqueId()));
-        }
-
+        lives = plugin.getPlayerManager().getLives(target.getUniqueId());
+        
         String display;
         switch (lives) {
             case 3 -> display = "§a❤❤❤";
