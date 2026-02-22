@@ -58,7 +58,6 @@ public class LivesSMP extends JavaPlugin {
             checker.checkForUpdates();
         }
 
-
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         getServer().getPluginManager().registerEvents(new CraftingListener(this), this);
@@ -77,7 +76,7 @@ public class LivesSMP extends JavaPlugin {
         getCommand("checklives").setExecutor(new CheckLivesCommand(this));
 
         if (getConfig().getBoolean("actionbar.enabled", true)) {
-            int interval = getConfig().getInt("actionbar.interval-ticks", 60);
+            int interval = getConfig().getInt("actionbar.interval-ticks", 40);
             getServer().getScheduler().runTaskTimerAsynchronously(this, new me.sparklee.LivesSMP.tasks.ActionBarTask(this), 0L, interval);
             getLogger().info("ActionBar life display enabled (interval: " + interval + " ticks)");
         }
