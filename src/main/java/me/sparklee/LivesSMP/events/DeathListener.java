@@ -35,25 +35,40 @@ public class DeathListener implements Listener {
             String durationStr = plugin.getConfig().getString("temporary-ban.duration", "1h");
             Date expires = tempBanEnabled ? parseDuration(durationStr) : null;
 
-            String banReason = MessageManager.get("no-lives-left", "&c☠ You’ve lost all your lives!");
+            String banReason = MessageManager.get("no-lives-left", "&c☠ You've lost all your lives!");
             String kickMessage;
 
             if (tempBanEnabled) {
                 kickMessage = MessageManager.get("ban-temp-message",
-                        "&c☠ You’ve lost all your lives!\n&7You are banned for a limited time.");
+                        "&c☠ You've lost all your lives!\n&7You are banned for a limited time.");
             } else {
                 kickMessage = MessageManager.get("ban-permanent-message",
-                        "&c☠ You’ve lost all 3 of your lives!\n&7You are now banned until someone revives you.");
+                        "&c☠ You've lost all 3 of your lives!\n&7You are now banned until someone revives you.");
             }
 
-            BanList banList = Bukkit.getBanList(BanList.Type.NAME);
-            banList.addBan(player.getName(), banReason, expires, "LivesSMP");
+            // Force sync DB write before ban/kick so lives=0 is guaranteed in DB
+            // This prevents onQuit's async write racing with this one
+            if (plugin.getDatabaseManager().isEnabled()) {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    plugin.getDatabaseManager().setLives(player.getUniqueId().toString(), 0);
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+                        banList.addBan(player.getName(), banReason, expires, "LivesSMP");
+                        player.kickPlayer(kickMessage);
+                        plugin.getLogger().info(player.getName() + " was "
+                                + (tempBanEnabled ? "temporarily" : "permanently")
+                                + " banned for losing all lives.");
+                    });
+                });
+            } else {
+                BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+                banList.addBan(player.getName(), banReason, expires, "LivesSMP");
+                player.kickPlayer(kickMessage);
+                plugin.getLogger().info(player.getName() + " was "
+                        + (tempBanEnabled ? "temporarily" : "permanently")
+                        + " banned for losing all lives.");
+            }
 
-            player.kickPlayer(kickMessage);
-
-            plugin.getLogger().info(player.getName() + " was "
-                    + (tempBanEnabled ? "temporarily" : "permanently")
-                    + " banned for losing all lives.");
         } else {
             player.sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("life-lost", "&cYou lost a life! &7Lives remaining: &e%lives%"),

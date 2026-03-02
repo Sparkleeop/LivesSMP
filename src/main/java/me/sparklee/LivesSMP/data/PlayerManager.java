@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,7 +12,6 @@ public class PlayerManager {
 
     private final LivesSMP plugin;
     private final Map<UUID, Integer> livesCache = new ConcurrentHashMap<>();
-    private final Set<UUID> pendingWrites = ConcurrentHashMap.newKeySet();
 
     public PlayerManager(LivesSMP plugin) {
         this.plugin = plugin;
@@ -32,27 +30,27 @@ public class PlayerManager {
     }
 
     public boolean hasData(Player player) {
-        UUID uuid = player.getUniqueId();
-        return livesCache.containsKey(uuid) || pendingWrites.contains(uuid);
+        return livesCache.containsKey(player.getUniqueId());
     }
 
     public boolean hasData(UUID uuid) {
-        return livesCache.containsKey(uuid) || pendingWrites.contains(uuid);
+        return livesCache.containsKey(uuid);
+    }
+
+    public Map<UUID, Integer> getCacheDirectly() {
+        return livesCache;
     }
 
     public void loadPlayer(UUID uuid) {
-        if (!plugin.getDatabaseManager().isEnabled()) {
-            int lives = plugin.getConfig().getInt("data." + uuid, getDefaultLives());
-            livesCache.put(uuid, lives);
-            return;
+        // YAML path only
+        int lives = plugin.getConfig().getInt("data." + uuid, -1);
+        if (lives == -1) {
+            // First time player
+            lives = getDefaultLives();
+            plugin.getConfig().set("data." + uuid, lives);
+            plugin.saveConfig();
         }
-
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            int lives = plugin.getDatabaseManager().getLives(uuid.toString());
-            if (lives != -1) {
-                livesCache.put(uuid, lives);
-            }
-        });
+        livesCache.put(uuid, lives);
     }
 
     public int getLives(Player player) {
@@ -71,11 +69,12 @@ public class PlayerManager {
         livesCache.put(uuid, lives);
 
         if (plugin.getDatabaseManager().isEnabled()) {
-            pendingWrites.add(uuid);
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                plugin.getDatabaseManager().setLives(uuid.toString(), lives);
-                pendingWrites.remove(uuid);
-            });
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+                    plugin.getDatabaseManager().setLives(uuid.toString(), lives)
+            );
+        } else {
+            plugin.getConfig().set("data." + uuid, lives);
+            plugin.saveConfig();
         }
     }
 
@@ -110,15 +109,11 @@ public class PlayerManager {
     }
 
     public void unload(UUID uuid) {
-        if (pendingWrites.contains(uuid)) {
-            // Write still in flight — retry in 2 seconds
-            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> unload(uuid), 40L);
-            return;
-        }
         livesCache.remove(uuid);
     }
 
     public void saveData() {
+        // Called on shutdown — sync flush everything to DB/YAML
         if (plugin.getDatabaseManager().isEnabled()) {
             livesCache.forEach((uuid, lives) ->
                     plugin.getDatabaseManager().setLives(uuid.toString(), lives)

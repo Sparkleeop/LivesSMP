@@ -44,8 +44,7 @@ public class AddLivesCommand implements CommandExecutor {
             return true;
         }
 
-        int current = plugin.getPlayerManager().getLives(
-                target.isOnline() ? target.getPlayer() : Bukkit.getPlayer(target.getUniqueId()));
+        int current = plugin.getPlayerManager().getLives(target.getUniqueId());
         int newLives = current + amount;
 
         int maxLives = plugin.getPlayerManager().getMaxLives();

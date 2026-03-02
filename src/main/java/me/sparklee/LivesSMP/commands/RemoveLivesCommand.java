@@ -44,8 +44,7 @@ public class RemoveLivesCommand implements CommandExecutor {
             return true;
         }
 
-        int current = plugin.getPlayerManager().getLives(
-                target.isOnline() ? target.getPlayer() : Bukkit.getPlayer(target.getUniqueId()));
+        int current = plugin.getPlayerManager().getLives(target.getUniqueId());
         int newLives = Math.max(0, current - amount);
         plugin.getPlayerManager().setLives(target.getUniqueId(), newLives);
 
