@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +13,7 @@ public class PlayerManager {
 
     private final LivesSMP plugin;
     private final Map<UUID, Integer> livesCache = new ConcurrentHashMap<>();
+    private final Set<UUID> pendingWrites = ConcurrentHashMap.newKeySet();
 
     public PlayerManager(LivesSMP plugin) {
         this.plugin = plugin;
@@ -30,11 +32,12 @@ public class PlayerManager {
     }
 
     public boolean hasData(Player player) {
-        return livesCache.containsKey(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
+        return livesCache.containsKey(uuid) || pendingWrites.contains(uuid);
     }
 
     public boolean hasData(UUID uuid) {
-        return livesCache.containsKey(uuid);
+        return livesCache.containsKey(uuid) || pendingWrites.contains(uuid);
     }
 
     public void loadPlayer(UUID uuid) {
@@ -60,7 +63,6 @@ public class PlayerManager {
         return livesCache.getOrDefault(uuid, getDefaultLives());
     }
 
-    // Needed for offline player lookups (e.g. AddLivesCommand, CheckLivesCommand)
     public int getLives(org.bukkit.OfflinePlayer player) {
         return getLives(player.getUniqueId());
     }
@@ -69,9 +71,11 @@ public class PlayerManager {
         livesCache.put(uuid, lives);
 
         if (plugin.getDatabaseManager().isEnabled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
-                    plugin.getDatabaseManager().setLives(uuid.toString(), lives)
-            );
+            pendingWrites.add(uuid);
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                plugin.getDatabaseManager().setLives(uuid.toString(), lives);
+                pendingWrites.remove(uuid);
+            });
         }
     }
 
@@ -106,6 +110,11 @@ public class PlayerManager {
     }
 
     public void unload(UUID uuid) {
+        if (pendingWrites.contains(uuid)) {
+            // Write still in flight — retry in 2 seconds
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> unload(uuid), 40L);
+            return;
+        }
         livesCache.remove(uuid);
     }
 

@@ -36,14 +36,19 @@ public class JoinListener implements Listener {
                 if (!player.isOnline()) return;
 
                 if (lives == -1) {
+                    // New player
                     plugin.getPlayerManager().setLives(player, startingLives);
                     player.sendMessage(MessageManager.formatPlaceholders(
                             MessageManager.get("join-new", "&aWelcome to Lives SMP! You have &e%lives% &alives."),
                             player.getName(), null, startingLives
                     ));
                 } else {
-                    plugin.getPlayerManager().setLives(player.getUniqueId(), lives);
-                    handleJoin(player, lives, startingLives);
+                    // Only populate cache if no pending writes exist
+                    // Prevents stale DB read overwriting a write that hasn't landed yet
+                    if (!plugin.getPlayerManager().hasData(player)) {
+                        plugin.getPlayerManager().setLives(player.getUniqueId(), lives);
+                    }
+                    handleJoin(player, plugin.getPlayerManager().getLives(player), startingLives);
                 }
             });
         });
