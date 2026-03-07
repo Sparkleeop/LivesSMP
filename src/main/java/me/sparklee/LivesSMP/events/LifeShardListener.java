@@ -32,16 +32,15 @@ public class LifeShardListener implements Listener {
 
         if (!data.has(key, PersistentDataType.INTEGER)) return;
 
-        int amount = data.get(key, PersistentDataType.INTEGER);
         int currentLives = plugin.getPlayerManager().getLives(player);
-        int newLives = currentLives + amount;
+        int newLives = currentLives + 1;
 
         plugin.getPlayerManager().setLives(player, newLives);
         item.setAmount(item.getAmount() - 1);
 
         player.sendMessage(MessageManager.formatPlaceholders(
-                MessageManager.get("life-shard-redeem", "&aYou redeemed a Life Shard and gained &e%lives% &alives!"),
-                player.getName(), null, amount
+                MessageManager.get("life-shard-redeem", "&aYou redeemed a Life Shard and gained 1 life!"),
+                player.getName(), null, 1
         ));
     }
 }
