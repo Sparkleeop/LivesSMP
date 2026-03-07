@@ -118,7 +118,7 @@ life-withdraw:
     material: HEART_OF_THE_SEA
     name: "&#FF4C4C❤ Life Shard"
     lore:
-      - "&7Redeem this to gain &e1 life&7."
+      - "&7Redeem this to gain an extra life."
       - "&8Obtained from /withdrawlife"
 
 # ─────────────────────────────────────────────────────────
@@ -171,7 +171,7 @@ messages:
   withdraw-success: "&aYou withdrew &e%lives% &alives into Life Shards!"
   withdraw-usage: "&eUsage: /withdrawlife <amount>"
   withdraw-too-low: "&cYou cannot withdraw that many lives!"
-  life-shard-redeem: "&aYou redeemed a Life Shard and gained &e%lives% &alives!"
+  life-shard-redeem: "&aYou redeemed a Life Shard and gained an extra life"
 
 # ─────────────────────────────────────────────────────────
 # MySQL Database Settings
