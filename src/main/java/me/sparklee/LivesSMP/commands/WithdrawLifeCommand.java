@@ -82,10 +82,6 @@ public class WithdrawLifeCommand implements CommandExecutor {
         }
         meta.setLore(lore);
 
-        // Tag it as a life shard with the amount stored
-        NamespacedKey key = new NamespacedKey(plugin, "life_shard");
-        meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, amount);
-
         item.setItemMeta(meta);
 
         // Handle full inventory — refund lives if no space

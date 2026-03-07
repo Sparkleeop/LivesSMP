@@ -27,10 +27,6 @@ public class LifeShardListener implements Listener {
         if (item == null || !item.hasItemMeta()) return;
 
         Player player = event.getPlayer();
-        NamespacedKey key = new NamespacedKey(plugin, "life_shard");
-        PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
-
-        if (!data.has(key, PersistentDataType.INTEGER)) return;
 
         int currentLives = plugin.getPlayerManager().getLives(player);
         int newLives = currentLives + 1;
