@@ -2,6 +2,7 @@ package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
 import me.sparklee.LivesSMP.utils.MessageManager;
+import me.sparklee.LivesSMP.utils.Scheduler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,12 +22,21 @@ public class ReloadCommand implements CommandExecutor {
             return true;
         }
 
-        plugin.reloadConfig();
-        plugin.getReviveItem().reloadRecipe();
-        MessageManager.load();
+        // Config + recipe changes touch global state, so run them on the global region thread.
+        Scheduler.global(() -> {
+            if (plugin.getConfigManager() != null) {
+                plugin.getConfigManager().load();
+            } else {
+                plugin.reloadConfig();
+            }
 
-        sender.sendMessage(MessageManager.get("reload-success", "&aConfiguration reloaded successfully!"));
-        plugin.getLogger().info("Config and revive recipe reloaded by " + sender.getName());
+            MessageManager.load();
+            plugin.getReviveItem().reloadRecipe();
+            plugin.startActionBarTask();
+
+            sender.sendMessage(MessageManager.get("reload-success", "&aConfiguration reloaded successfully!"));
+            plugin.getLogger().info("Config and revive recipe reloaded by " + sender.getName());
+        });
         return true;
     }
 }

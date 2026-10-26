@@ -1,9 +1,13 @@
 package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
+import java.util.Locale;
 
 public class MainCommand implements CommandExecutor {
 
@@ -15,8 +19,33 @@ public class MainCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (args.length > 0) {
+            String subcommand = args[0].toLowerCase(Locale.ROOT);
+
+            if (subcommand.equals("help")) {
+                showHelp(sender);
+                return true;
+            }
+
+            CommandExecutor executor = plugin.getExecutor(subcommand);
+            if (executor == null) {
+                sender.sendMessage(MessageManager.formatPlaceholders(
+                        MessageManager.get("unknown-subcommand", "&cUnknown subcommand: &e%target%"),
+                        sender.getName(), args[0], 0
+                ));
+                return true;
+            }
+
+            return executor.onCommand(sender, cmd, subcommand, Arrays.copyOfRange(args, 1, args.length));
+        }
+
+        showHelp(sender);
+        return true;
+    }
+
+    private void showHelp(CommandSender sender) {
         sender.sendMessage(" ");
-        sender.sendMessage("§6§lLivesSMP §7v" + plugin.getDescription().getVersion());
+        sender.sendMessage("§6§lLivesSMP §7v" + plugin.getPluginMeta().getVersion());
         sender.sendMessage("§7Created by §eSparklee");
         sender.sendMessage(" ");
         sender.sendMessage("§6§lCommands:");
@@ -26,13 +55,13 @@ public class MainCommand implements CommandExecutor {
         sender.sendMessage("§e/addlives <player> <amount> §7– Add lives to a player");
         sender.sendMessage("§e/removelives <player> <amount> §7– Remove lives from a player");
         sender.sendMessage("§e/setlives <player> <amount> §7– Set a player's lives");
-        sender.sendMessage("§e/checklives <player> §7– Check another player’s lives");
+        sender.sendMessage("§e/checklives <player> §7– Check another player's lives");
+        sender.sendMessage("§e/withdrawlife <amount> §7– Withdraw lives into Life Shards");
         sender.sendMessage("§e/toplives §7– View the leaderboard of top players");
         sender.sendMessage("§e/livessmpreload §7– Reload the plugin configuration");
         sender.sendMessage(" ");
         sender.sendMessage("§7All commands also work via §e/livessmp <subcommand>§7!");
         sender.sendMessage("§7----------------------------------");
         sender.sendMessage(" ");
-        return true;
     }
 }

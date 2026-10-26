@@ -2,6 +2,7 @@ package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
 import me.sparklee.LivesSMP.utils.MessageManager;
+import me.sparklee.LivesSMP.utils.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,25 +24,15 @@ public class LivesCommand implements CommandExecutor {
         }
 
         int lives = plugin.getPlayerManager().getLives(player);
-        String display;
 
-        // Color-coded hearts display
-        switch (lives) {
-            case 3 -> display = "§a❤❤❤";
-            case 2 -> display = "§e❤❤";
-            case 1 -> display = "§c❤";
-            default -> display = "§7☠";
-        }
-
-        String msg = MessageManager.formatPlaceholders(
-                MessageManager.get("lives-display", "&7You currently have &e%lives% &7lives remaining."),
+        String message = MessageManager.formatPlaceholders(
+                MessageManager.get("lives-display", "&7You currently have &e%lives% &7lives remaining. %hearts%"),
                 player.getName(), null, lives
-        );
+        ).replace("%hearts%", Messages.hearts(lives));
 
         player.sendMessage(" ");
-        player.sendMessage(msg);
+        player.sendMessage(message);
         player.sendMessage(" ");
-
         return true;
     }
 }

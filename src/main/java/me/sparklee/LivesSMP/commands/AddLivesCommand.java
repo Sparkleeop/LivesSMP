@@ -1,6 +1,7 @@
 package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.data.PlayerManager;
 import me.sparklee.LivesSMP.utils.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -19,9 +20,8 @@ public class AddLivesCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
         if (!sender.hasPermission("livessmp.admin")) {
-            sender.sendMessage(MessageManager.get("no-permission", "&cYou don’t have permission!"));
+            sender.sendMessage(MessageManager.get("no-permission", "&cYou don't have permission to do that!"));
             return true;
         }
 
@@ -30,8 +30,9 @@ public class AddLivesCommand implements CommandExecutor {
             return true;
         }
 
-        OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-        if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
+        OfflinePlayer target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) target = Bukkit.getOfflinePlayer(args[0]);
+        if (!target.hasPlayedBefore() && !target.isOnline()) {
             sender.sendMessage(MessageManager.get("player-never-joined", "&cThat player has never joined before!"));
             return true;
         }
@@ -40,42 +41,51 @@ public class AddLivesCommand implements CommandExecutor {
         try {
             amount = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(MessageManager.get("invalid-amount", "&cAmount must be a number!"));
+            sender.sendMessage(MessageManager.get("invalid-amount", "&cPlease provide a valid number for amount!"));
             return true;
         }
 
-        int current = plugin.getPlayerManager().getLives(target.getUniqueId());
-        int newLives = current + amount;
-
-        int maxLives = plugin.getPlayerManager().getMaxLives();
-        boolean unlimited = plugin.getPlayerManager().isUnlimitedLives();
-
-        if (!unlimited && newLives > maxLives) {
-            newLives = maxLives;
-            sender.sendMessage(MessageManager.formatPlaceholders(
-                    MessageManager.get("max-lives-reached", "&e%target% &aalready has the maximum of &e%lives% &alives!"),
-                    sender.getName(), target.getName(), maxLives)
-            );
+        if (amount <= 0) {
+            sender.sendMessage(MessageManager.get("invalid-amount", "&cPlease provide a valid number for amount!"));
+            return true;
         }
 
-        plugin.getPlayerManager().setLives(target.getUniqueId(), newLives);
+        PlayerManager playerManager = plugin.getPlayerManager();
+        Integer stored = playerManager.getStoredLives(target.getUniqueId());
+        if (stored == null) {
+            sender.sendMessage(MessageManager.get("database-error", "&cCould not read player data. Please try again later."));
+            return true;
+        }
+
+        int current = stored;
+        int newLives = playerManager.addLives(target.getUniqueId(), amount);
+        int added = newLives - current;
 
         String senderName = sender instanceof Player ? sender.getName() : "Console";
+        String targetName = target.getName() == null ? "" : target.getName();
+
+        if (added <= 0) {
+            sender.sendMessage(MessageManager.formatPlaceholders(
+                    MessageManager.get("max-lives-reached", "&e%target% &aalready has the maximum of &e%lives% &alives!"),
+                    senderName, targetName, playerManager.getMaxLives()
+            ));
+            return true;
+        }
 
         sender.sendMessage(MessageManager.formatPlaceholders(
                 MessageManager.get("add-success", "&aYou added &e%amount% &alives to &e%target%&a. (Now: &e%lives%&a)"),
-                senderName, target.getName(), newLives).replace("%amount%", String.valueOf(amount))
-        );
+                senderName, targetName, newLives, added
+        ));
 
         if (target.isOnline() && target.getPlayer() != null) {
             target.getPlayer().sendMessage(MessageManager.formatPlaceholders(
                     MessageManager.get("add-receive", "&aYour lives were increased by &e%player%&a! You now have &e%lives%&a lives."),
-                    senderName, target.getName(), newLives)
-            );
+                    senderName, targetName, newLives, added
+            ));
         }
 
-        plugin.getLogger().info("[Admin] " + senderName + " added " + amount + " lives to " + target.getName() + " (now " + newLives + ")");
-
+        plugin.getLogger().info("[Admin] " + senderName + " added " + added + " lives to "
+                + targetName + " (now " + newLives + ")");
         return true;
     }
 }

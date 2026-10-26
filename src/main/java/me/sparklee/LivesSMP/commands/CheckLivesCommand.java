@@ -1,6 +1,8 @@
 package me.sparklee.LivesSMP.commands;
 
 import me.sparklee.LivesSMP.LivesSMP;
+import me.sparklee.LivesSMP.utils.MessageManager;
+import me.sparklee.LivesSMP.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -17,41 +19,41 @@ public class CheckLivesCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-        // Permission check (optional)
         if (!sender.hasPermission("livessmp.check")) {
-            sender.sendMessage("§cYou don’t have permission to do that!");
+            sender.sendMessage(MessageManager.get("no-permission", "&cYou don't have permission to do that!"));
             return true;
         }
 
-        // Usage: /checklives <player>
         if (args.length != 1) {
-            sender.sendMessage("§eUsage: /checklives <player>");
+            sender.sendMessage(MessageManager.get("usage-check", "&eUsage: /checklives <player>"));
             return true;
         }
 
-        OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-        if (target == null || (!target.hasPlayedBefore() && !target.isOnline())) {
-            sender.sendMessage("§cThat player has never joined before!");
+        OfflinePlayer target = Bukkit.getPlayerExact(args[0]);
+        if (target == null) target = Bukkit.getOfflinePlayer(args[0]);
+        if (!target.hasPlayedBefore() && !target.isOnline()) {
+            sender.sendMessage(MessageManager.get("player-never-joined", "&cThat player has never joined before!"));
             return true;
         }
 
-        int lives;
-        lives = plugin.getPlayerManager().getLives(target.getUniqueId());
-        
-        String display;
-        switch (lives) {
-            case 3 -> display = "§a❤❤❤";
-            case 2 -> display = "§e❤❤";
-            case 1 -> display = "§c❤";
-            default -> display = "§7☠";
+        String targetName = target.getName() == null ? "" : target.getName();
+        Integer stored = plugin.getPlayerManager().getStoredLives(target.getUniqueId());
+        if (stored == null) {
+            sender.sendMessage(MessageManager.get("database-error", "&cCould not read player data. Please try again later."));
+            return true;
         }
+        int lives = stored;
 
         sender.sendMessage(" ");
-        sender.sendMessage("§6§l[LivesSMP] §f" + target.getName() + " currently has: " + display);
-        sender.sendMessage("§7Lives remaining: §e" + lives);
+        sender.sendMessage(MessageManager.formatPlaceholders(
+                MessageManager.get("check-lives", "&6%target% &fcurrently has: %hearts%"),
+                sender.getName(), targetName, lives
+        ).replace("%hearts%", Messages.hearts(lives)));
+        sender.sendMessage(MessageManager.formatPlaceholders(
+                MessageManager.get("check-lives-remaining", "&7Lives remaining: &e%lives%"),
+                sender.getName(), targetName, lives
+        ));
         sender.sendMessage(" ");
-
         return true;
     }
 }

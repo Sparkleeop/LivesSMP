@@ -18,11 +18,12 @@ public class ActionBarTask implements Runnable {
     public void run() {
         if (!plugin.getConfig().getBoolean("actionbar.enabled", true)) return;
 
+        // Runs synchronously: sending action bars from an async thread is not safe.
         for (Player player : Bukkit.getOnlinePlayers()) {
             int lives = plugin.getPlayerManager().getLives(player);
 
             Component message = Component.text("❤ x" + lives)
-                    .color(TextColor.color(0xFF0000));
+                    .color(TextColor.color(0xFF5555));
 
             player.sendActionBar(message);
         }

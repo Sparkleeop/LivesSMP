@@ -1,14 +1,16 @@
 name: LivesSMP
+version: '${project.version}'
 main: me.sparklee.LivesSMP.LivesSMP
-version: 2.2.2
-api-version: 1.21
+api-version: '1.21'
+description: A configurable lives and revival system for SMP servers.
 author: Sparklee
+website: https://github.com/Sparkleeop/LivesSMP
+folia-supported: true
 
 commands:
   livessmp:
     description: LivesSMP main command
-    usage: /livessmp <lives|revive|reload>
-    aliases: [revive, lives, livessmpreload]
+    usage: /livessmp [lives|revive|addlives|setlives|removelives|checklives|withdrawlife|toplives|reload]
   revive:
     description: Revive a banned player using a Revive Crystal
     usage: /revive <player>
@@ -16,7 +18,7 @@ commands:
     description: Check your remaining lives
     usage: /lives
   livessmpreload:
-    description: Reload 3LivesSMP configuration
+    description: Reload the LivesSMP configuration
     usage: /livessmpreload
   addlives:
     description: Add lives to a player
@@ -28,7 +30,7 @@ commands:
     description: Remove lives from a player
     usage: /removelives <player> <amount>
   checklives:
-    description: Check another player’s lives
+    description: Check another player's lives
     usage: /checklives <player>
   toplives:
     description: Shows the top players with the most lives
@@ -39,7 +41,7 @@ commands:
 
 permissions:
   livessmp.admin:
-    description: Allows managing player lives (add/set/remove)
+    description: Allows managing player lives (add/set/remove) and reloading the plugin
     default: op
   livessmp.bypass:
     description: Prevents life loss and bans from LivesSMP
@@ -50,4 +52,3 @@ permissions:
   livessmp.withdraw:
     description: Allows withdrawing lives into items
     default: true
-

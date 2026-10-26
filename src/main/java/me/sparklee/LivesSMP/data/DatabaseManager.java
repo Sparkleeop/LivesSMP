@@ -1,108 +1,100 @@
 package me.sparklee.LivesSMP.data;
 
 import me.sparklee.LivesSMP.LivesSMP;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
+import me.sparklee.LivesSMP.utils.Scheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class DatabaseManager {
 
     private final LivesSMP plugin;
-    private Connection connection;
-    private boolean enabled = false;
+
+    private volatile Connection connection;
+    private volatile boolean enabled = false;
+    private volatile boolean configured = false;
 
     private String host, database, username, password;
     private int port;
+    private ScheduledTask keepAliveTask;
 
     public DatabaseManager(LivesSMP plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * Connects synchronously so the storage backend is known before players join.
+     * If the connection fails the plugin falls back to YAML storage automatically.
+     */
     public void connect() {
-        if (!plugin.getConfig().getBoolean("mysql.enabled")) {
+        if (!plugin.getConfig().getBoolean("mysql.enabled", false)) {
             plugin.getLogger().info("MySQL disabled — using YAML storage.");
             return;
         }
 
-        host = plugin.getConfig().getString("mysql.host");
-        port = plugin.getConfig().getInt("mysql.port");
-        database = plugin.getConfig().getString("mysql.database");
-        username = plugin.getConfig().getString("mysql.username");
-        password = plugin.getConfig().getString("mysql.password");
+        host = plugin.getConfig().getString("mysql.host", "localhost");
+        port = plugin.getConfig().getInt("mysql.port", 3306);
+        database = plugin.getConfig().getString("mysql.database", "livesmp");
+        username = plugin.getConfig().getString("mysql.username", "root");
+        password = plugin.getConfig().getString("mysql.password", "");
 
-        // Connect + setup on async thread — safe at startup before players join
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                connection = DriverManager.getConnection(
-                        "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true",
-                        username, password
-                );
-                setupTable();
-                enabled = true;
-                plugin.getLogger().info("✅ Connected to MySQL successfully!");
-                startKeepAlive();
-            } catch (SQLException e) {
-                plugin.getLogger().severe("❌ Failed to connect to MySQL: " + e.getMessage());
-                enabled = false;
-            }
-        });
+        try {
+            DriverManager.setLoginTimeout(5);
+            connection = openConnection();
+            setupTable();
+            configured = true;
+            enabled = true;
+            plugin.getLogger().info("✅ Connected to MySQL successfully!");
+            startKeepAlive();
+        } catch (SQLException e) {
+            plugin.getLogger().severe("❌ Failed to connect to MySQL: " + e.getMessage());
+            plugin.getLogger().warning("Falling back to YAML storage for this session.");
+            configured = false;
+            enabled = false;
+            closeQuietly();
+        }
     }
 
-    private void setupTable() {
+    private Connection openConnection() throws SQLException {
+        return DriverManager.getConnection(
+                "jdbc:mysql://" + host + ":" + port + "/" + database
+                        + "?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true"
+                        + "&connectTimeout=5000&socketTimeout=10000",
+                username, password
+        );
+    }
+
+    private void setupTable() throws SQLException {
+        if (connection == null) throw new SQLException("No database connection");
         try (PreparedStatement ps = connection.prepareStatement(
-                "CREATE TABLE IF NOT EXISTS player_lives (uuid VARCHAR(36) PRIMARY KEY, lives INT)"
+                "CREATE TABLE IF NOT EXISTS player_lives (uuid VARCHAR(36) PRIMARY KEY, lives INT NOT NULL)"
         )) {
             ps.executeUpdate();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to create table: " + e.getMessage());
         }
     }
 
     private void startKeepAlive() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!enabled) return;
-                try {
-                    if (!isConnected()) {
-                        plugin.getLogger().warning("[LivesSMP] MySQL connection lost! Attempting reconnect...");
-                        reconnect();
-                    } else {
-                        try (PreparedStatement ps = connection.prepareStatement("SELECT 1")) {
-                            ps.executeQuery();
-                        }
-                    }
-                } catch (SQLException e) {
-                    plugin.getLogger().warning("[LivesSMP] MySQL keep-alive failed: " + e.getMessage());
-                    reconnect();
-                }
+        keepAliveTask = Scheduler.asyncTimer(plugin, () -> {
+            if (!configured) return;
+            ensureConnection();
+            if (connection == null) return;
+            try (PreparedStatement ps = connection.prepareStatement("SELECT 1")) {
+                ps.executeQuery();
+            } catch (SQLException e) {
+                plugin.getLogger().warning("[LivesSMP] MySQL keep-alive failed: " + e.getMessage());
+                reconnect();
             }
-        }.runTaskTimerAsynchronously(plugin, 20L * 60 * 5, 20L * 60 * 5);
+        }, 20L * 60 * 5, 20L * 60 * 5);
     }
 
-    private boolean isConnected() {
-        try {
-            return connection != null && connection.isValid(2);
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    private synchronized void reconnect() {
-        try {
-            if (connection != null && !connection.isClosed()) connection.close();
-            connection = DriverManager.getConnection(
-                    "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true",
-                    username, password
-            );
-            plugin.getLogger().info("🔄 Reconnected to MySQL successfully!");
-        } catch (SQLException e) {
-            plugin.getLogger().severe("❌ MySQL reconnection failed: " + e.getMessage());
-        }
-    }
-
-    private void ensureConnection() {
+    private synchronized void ensureConnection() {
         try {
             if (connection == null || connection.isClosed() || !connection.isValid(2)) {
                 reconnect();
@@ -112,28 +104,73 @@ public class DatabaseManager {
         }
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    private synchronized void reconnect() {
+        closeQuietly();
+        try {
+            connection = openConnection();
+            setupTable();
+            enabled = true;
+            plugin.getLogger().info("🔄 Reconnected to MySQL successfully!");
+        } catch (SQLException e) {
+            connection = null;
+            enabled = false;
+            plugin.getLogger().severe("❌ MySQL reconnection failed: " + e.getMessage());
+        }
     }
 
-    public int getLives(String uuid) {
-        if (!enabled) return -1;
+    private void closeQuietly() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            connection = null;
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled && connection != null;
+    }
+
+    /**
+     * True when MySQL was selected and successfully connected at startup.
+     * Unlike {@link #isEnabled()} this stays true during a temporary outage so the
+     * plugin keeps writing to the database instead of silently switching to YAML.
+     */
+    public boolean isConfigured() {
+        return configured;
+    }
+
+    /**
+     * @return the stored lives, {@code -1} when the player has no row, or {@code null} on a database error.
+     */
+    public synchronized Integer getLives(String uuid) {
+        if (!configured) return null;
         ensureConnection();
+        if (!isEnabled()) return null;
+
         try (PreparedStatement ps = connection.prepareStatement(
                 "SELECT lives FROM player_lives WHERE uuid=?"
         )) {
             ps.setString(1, uuid);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt("lives");
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("lives") : -1;
+            }
         } catch (SQLException e) {
             plugin.getLogger().severe("[LivesSMP] getLives() SQL error: " + e.getMessage());
+            return null;
         }
-        return -1;
     }
 
-    public void setLives(String uuid, int lives) {
-        if (!enabled) return;
+    /**
+     * @return true when the value was persisted, false on a database error.
+     */
+    public synchronized boolean setLives(String uuid, int lives) {
+        if (!configured) return false;
         ensureConnection();
+        if (!isEnabled()) return false;
+
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO player_lives (uuid, lives) VALUES (?, ?) ON DUPLICATE KEY UPDATE lives=?"
         )) {
@@ -141,21 +178,52 @@ public class DatabaseManager {
             ps.setInt(2, lives);
             ps.setInt(3, lives);
             ps.executeUpdate();
+            return true;
         } catch (SQLException e) {
             plugin.getLogger().severe("[LivesSMP] setLives() SQL error: " + e.getMessage());
+            return false;
         }
     }
 
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) connection.close();
-        } catch (SQLException e) {
-            plugin.getLogger().warning("Error closing MySQL connection: " + e.getMessage());
-        }
-    }
-
-    public Connection getConnection() {
+    /**
+     * @return the leaderboard entries, or {@code null} when the query failed.
+     */
+    public synchronized List<LivesEntry> getTopLives(int limit) {
+        List<LivesEntry> entries = new ArrayList<>();
+        if (!configured) return entries;
         ensureConnection();
-        return connection;
+        if (!isEnabled()) return null;
+
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT uuid, lives FROM player_lives ORDER BY lives DESC LIMIT ?"
+        )) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        entries.add(new LivesEntry(UUID.fromString(rs.getString("uuid")), rs.getInt("lives")));
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().warning("[LivesSMP] Skipping invalid UUID in leaderboard: " + rs.getString("uuid"));
+                    }
+                }
+            }
+            return entries;
+        } catch (SQLException e) {
+            plugin.getLogger().severe("[LivesSMP] Failed to fetch MySQL leaderboard: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public synchronized void close() {
+        enabled = false;
+        configured = false;
+        if (keepAliveTask != null) {
+            keepAliveTask.cancel();
+            keepAliveTask = null;
+        }
+        closeQuietly();
+    }
+
+    public record LivesEntry(UUID uuid, int lives) {
     }
 }

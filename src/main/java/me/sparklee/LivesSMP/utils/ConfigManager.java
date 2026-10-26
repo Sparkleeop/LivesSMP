@@ -1,18 +1,23 @@
 package me.sparklee.LivesSMP.utils;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class ConfigManager {
 
     private final JavaPlugin plugin;
     private final String fileName;
+    private final File config;
     private FileConfiguration configFile;
-    private File config;
 
     public ConfigManager(JavaPlugin plugin, String fileName) {
         this.plugin = plugin;
@@ -41,9 +46,6 @@ public class ConfigManager {
             createBackup(currentVersion);
 
             mergeConfigs(configFile, defaultConfig, "");
-
-            removeUnusedKeys(configFile, defaultConfig, "");
-
             configFile.set("config-version", defaultVersion);
 
             try {
@@ -55,12 +57,17 @@ public class ConfigManager {
         } else {
             plugin.getLogger().info("✓ " + fileName + " is up to date (v" + currentVersion + ").");
         }
+
+        // Make sure JavaPlugin#getConfig() points at the file we just loaded/migrated.
+        plugin.reloadConfig();
     }
 
     private FileConfiguration getDefaultConfig() {
         try (InputStream defStream = plugin.getResource(fileName)) {
             if (defStream == null) return null;
-            return YamlConfiguration.loadConfiguration(new InputStreamReader(defStream));
+            return YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(defStream, StandardCharsets.UTF_8)
+            );
         } catch (IOException e) {
             plugin.getLogger().severe("Failed to load default " + fileName + ": " + e.getMessage());
             return null;
@@ -68,7 +75,10 @@ public class ConfigManager {
     }
 
     private void mergeConfigs(FileConfiguration target, FileConfiguration defaults, String path) {
-        Set<String> keys = defaults.getConfigurationSection(path).getKeys(false);
+        ConfigurationSection defaultsSection = defaults.getConfigurationSection(path);
+        if (defaultsSection == null) return;
+
+        Set<String> keys = defaultsSection.getKeys(false);
         for (String key : keys) {
             String fullPath = path.isEmpty() ? key : path + "." + key;
 
@@ -77,31 +87,9 @@ public class ConfigManager {
                     target.createSection(fullPath);
                 }
                 mergeConfigs(target, defaults, fullPath);
-            } else {
-                if (!target.contains(fullPath)) {
-                    target.set(fullPath, defaults.get(fullPath));
-                    plugin.getLogger().info("✓ Added missing key: " + fullPath);
-                }
-            }
-        }
-    }
-
-
-    private void removeUnusedKeys(FileConfiguration current, FileConfiguration defaults, String path) {
-        if (current.getConfigurationSection(path) == null) return;
-        for (String key : current.getConfigurationSection(path).getKeys(false)) {
-            String fullPath = path.isEmpty() ? key : path + "." + key;
-
-            if (current.isConfigurationSection(fullPath)) {
-                removeUnusedKeys(current, defaults, fullPath);
-                if (current.getConfigurationSection(fullPath).getKeys(false).isEmpty()
-                        && !defaults.contains(fullPath)) {
-                    current.set(fullPath, null);
-                    plugin.getLogger().info("✘️ Removed deprecated section: " + fullPath);
-                }
-            } else if (!defaults.contains(fullPath)) {
-                current.set(fullPath, null);
-                plugin.getLogger().info("✘ Removed deprecated key: " + fullPath);
+            } else if (!target.contains(fullPath)) {
+                target.set(fullPath, defaults.get(fullPath));
+                plugin.getLogger().info("✓ Added missing key: " + fullPath);
             }
         }
     }

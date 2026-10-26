@@ -1,14 +1,14 @@
 ###########################################################
 #                  LivesSMP Configuration                 #
 #       Created by Sparklee | https://www.spigotmc.org/members/sparklee.1696271/         #
-#   For help with Mat~erial names, see:                    #
+#   For help with Material names, see:                     #
 #   https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 ###########################################################
 
 # ─────────────────────────────────────────────────────────
 # DO NOT TOUCH
 # ─────────────────────────────────────────────────────────
-config-version: 8
+config-version: 9
 
 # ───────────────────────────────────────────────
 # Update Checker
@@ -34,7 +34,7 @@ starting-lives: 3
 # Temporary Ban Settings
 # When enabled, players with 0 lives will be banned for a limited time
 # instead of permanently.
-# duration: how long the ban lasts (in minutes)
+# duration: how long the ban lasts
 # Supported units: m = minutes, h = hours, d = days
 # Example: "30m", "2h", "1d"
 # ─────────────────────────────────────────────────────────
@@ -45,6 +45,7 @@ temporary-ban:
 # ─────────────────────────────────────────────────────────
 # Life Steal Settings
 # When a player kills another player, they steal lives.
+# The victim still loses one life from dying; the killer gains lives.
 # ─────────────────────────────────────────────────────────
 life-steal:
   enabled: true
@@ -78,7 +79,7 @@ revive-crystal:
   # Enable or disable crafting of the Revive Crystal.
   enabled: true
 
-  # How many crystals are crafted per recipe.
+  # How many crystals are crafted per recipe. (1-64)
   amount: 1
 
   # Crafting shape (3 lines, each 3 characters).
@@ -113,7 +114,7 @@ revive-crystal:
 # ─────────────────────────────────────────────────────────
 life-withdraw:
   enabled: true
-  min-lives: 1       # Prevents players from withdrawing if they’ll have 0 or less left
+  min-lives: 1       # Prevents players from withdrawing if they'll have 0 or less left
   item:
     material: HEART_OF_THE_SEA
     name: "&#FF4C4C❤ Life Shard"
@@ -126,28 +127,37 @@ life-withdraw:
 # Supports & color codes and hex colors using &#RRGGBB (e.g. &#FF9F68)
 # ─────────────────────────────────────────────────────────
 messages:
-  join-new: "&aWelcome to Lives SMP! You’ve been given &e3 lives&a."
+  only-player: "&cOnly players can use this command!"
+
+  join-new: "&aWelcome to Lives SMP! You’ve been given &e%lives% lives&a."
   join-return: "&7Welcome back! You currently have &e%lives% &7lives."
 
   life-lost: "&cYou lost a life! &7Lives remaining: &e%lives%"
   no-lives-left: "&c☠ You’ve lost all of your lives! You are now banned until revived."
 
+  revive-usage: "&cUsage: /revive <player>"
   revive-success: "&aYou revived &e%target%&a!"
   revive-target: "&aYou’ve been revived by &e%player%&a!"
   revive-broadcast: "&#FF9F68⚡ &e%player% &7has revived &b%target% &7using a Revive Crystal!"
   revive-invalid-item: "&cYou must hold a Revive Crystal to use this!"
   revive-invalid-player: "&cThat player has never joined the server!"
   revive-not-zero: "&eThat player still has lives left and cannot be revived!"
+  revive-error: "&cCould not read that player's data. Please try again."
   auto-revive: "&aYou were revived and restored to &e%lives% &alives!"
 
-  lives-display: "&7You currently have &e%lives% &7lives remaining."
+  lives-display: "&7You currently have &e%lives% &7lives remaining. %hearts%"
+
+  check-lives: "&6%target% &fcurrently has: %hearts%"
+  check-lives-remaining: "&7Lives remaining: &e%lives%"
 
   no-permission: "&cYou don't have permission to do that!"
   invalid-amount: "&cPlease provide a valid number for amount!"
+  database-error: "&cCould not read player data. Please try again later."
   player-never-joined: "&cThat player has never joined before!"
   usage-add: "&eUsage: /addlives <player> <amount>"
   usage-remove: "&eUsage: /removelives <player> <amount>"
   usage-set: "&eUsage: /setlives <player> <amount>"
+  usage-check: "&eUsage: /checklives <player>"
 
   add-success: "&aYou added &e%amount% &alives to &e%target%&a. (Now: &e%lives%&a)"
   add-receive: "&aYour lives were increased by &e%player%&a! You now have &e%lives%&a lives."
@@ -171,7 +181,16 @@ messages:
   withdraw-success: "&aYou withdrew &e%lives% &alives into Life Shards!"
   withdraw-usage: "&eUsage: /withdrawlife <amount>"
   withdraw-too-low: "&cYou cannot withdraw that many lives!"
-  life-shard-redeem: "&aYou redeemed a Life Shard and gained an extra life"
+  withdraw-too-many: "&cYou cannot withdraw that many lives at once!"
+  withdraw-disabled: "&cLife withdrawing is disabled."
+  withdraw-inventory-full: "&cYour inventory is full! Lives were not withdrawn."
+  life-shard-redeem: "&aYou redeemed a Life Shard and gained a life! You now have &e%lives%&a."
+  life-shard-max: "&eYou already have the maximum of &e%lives% &elives!"
+
+  reload-success: "&aConfiguration reloaded successfully!"
+  leaderboard-empty: "&7No player data found yet!"
+  leaderboard-error: "&cFailed to load the leaderboard! Check the console."
+  unknown-subcommand: "&cUnknown subcommand: &e%target%"
 
 # ─────────────────────────────────────────────────────────
 # MySQL Database Settings

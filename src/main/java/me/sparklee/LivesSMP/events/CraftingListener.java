@@ -18,7 +18,7 @@ public class CraftingListener implements Listener {
     public void onPrepareCraft(PrepareItemCraftEvent event) {
         for (ItemStack item : event.getInventory().getMatrix()) {
             if (plugin.getReviveItem().isReviveCrystal(item)) {
-                // Cancel the recipe output
+                // Prevent revive crystals from being consumed as a crafting ingredient.
                 event.getInventory().setResult(null);
                 return;
             }
